@@ -1,15 +1,100 @@
 const cheerio = require('cheerio');
 const cliProgress = require('cli-progress');
 const fs = require('fs').promises;
+const { NOTICES_OUTPUT_JSON } = require('./lib/config');
+const { getDistrictsByState } = require('../db-configs/turso.db.js');
 const path = require('path');
 
 /**
- * Scrapes recruitment notices from upanganwadibharti.in.
+ * Scrapes notices for a specific vacancy type (Worker or Helper).
  *
+ * @param {cheerio.CheerioAPI} $ - The cheerio instance for the page.
+ * @param {string} vacancyTitle - The title to search for, e.g., "Worker Vacancies".
+ * @param {string} typeCode - The code to assign, e.g., "W" or "H".
+ * @param {Map<string, {name: string, external_id: any}>} districtNameMap - A Map from lowercase Hindi district names to district info.
+ * @returns {Array<Object>} An array of notice objects for this type.
+ */
+function scrapeVacancyType($, vacancyTitle, typeCode, districtNameMap) {
+    const notices = [];
+    const container = $(`h4:contains("${vacancyTitle}")`).parent();
+    const noticeCards = container.find('.notice-card');
+
+    if (noticeCards.length === 0) {
+        console.log(`No notice cards found for "${vacancyTitle}".`);
+        return [];
+    }
+
+    console.log(`Found ${noticeCards.length} notice cards for "${vacancyTitle}". Scraping details...`);
+
+    noticeCards.each((index, element) => {
+        const card = $(element);
+
+        let scrapedTitle = card.find('.notice-header > span:first-child').text().trim().replace(/^📄\s*/, '');
+        const titleParts = scrapedTitle.split('–');
+        if (titleParts.length > 1) {
+            scrapedTitle = titleParts[0].trim();
+        }
+
+        const status = card.find('.notice-badge').text().trim();
+
+        const detailsText = card.find('.notice-details').text();
+        const uploadedDateMatch = detailsText.match(/Uploaded:\s*(\d{2}-\d{2}-\d{4})/);
+        const lastDateMatch = detailsText.match(/Last Date:\s*(\d{2}-\d{2}-\d{4})/);
+
+        const uploadedDate = uploadedDateMatch ? uploadedDateMatch[1] : null;
+        const lastDate = lastDateMatch ? lastDateMatch[1] : null;
+
+        const link = card.find('.notice-link').attr('href');
+
+        let isStillActive = false;
+        if (lastDate) {
+            const [day, month, year] = lastDate.split('-').map(Number);
+            const lastDateObj = new Date(year, month - 1, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            isStillActive = lastDateObj >= today;
+        }
+
+        let finalTitle = scrapedTitle;
+        let externalId = null;
+        const districtInfo = districtNameMap.get(scrapedTitle.toLowerCase());
+
+        if (districtInfo) {
+            finalTitle = districtInfo.name;
+            externalId = districtInfo.external_id;
+        } else if (scrapedTitle) {
+            console.warn(`\n[!] Warning: Scraped district "${scrapedTitle}" not found in the database. Keeping original title.`);
+        }
+
+        if (finalTitle && isStillActive) {
+            const notice = {
+                title: finalTitle,
+                status,
+                uploadedDate,
+                lastDate,
+                link,
+                type: typeCode,
+            };
+            if (externalId) {
+                notice.external_id = externalId;
+            }
+            notices.push(notice);
+        }
+    });
+
+    console.log(`Successfully scraped ${notices.length} active notices for "${vacancyTitle}".`);
+    return notices;
+}
+
+/**
+ * Scrapes all recruitment notices (Worker and Helper) from upanganwadibharti.in.
+ *
+ * @param {import('got-scraping').GotScraping} httpClient The HTTP client to use for requests.
+ * @param {Map<string, {name: string, external_id: any}>} districtNameMap - A Map from lowercase Hindi district names to district info.
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of notice objects.
  * Each object contains title, status, uploadedDate, lastDate, and link.
  */
-async function scrapeNotices(httpClient) {
+async function scrapeNotices(httpClient, districtNameMap) {
     const url = 'https://upanganwadibharti.in/';
     console.log(`Fetching data from ${url}...`);
 
@@ -20,98 +105,35 @@ async function scrapeNotices(httpClient) {
         // Load HTML into cheerio
         const $ = cheerio.load(html);
 
-        const notices = [];
-        // Find the heading for "Worker Vacancies" and then select the notice cards
-        // within its parent container. This ensures we only scrape from that section.
-        const workerVacanciesContainer = $('h4:contains("Worker Vacancies")').parent();
-        const noticeCards = workerVacanciesContainer.find('.notice-card');
+        const vacancyTypes = [
+            { title: 'Worker Vacancies', code: 'W' },
+            { title: 'Helper Vacancies', code: 'H' },
+        ];
 
+        let allNotices = [];
 
-        if (noticeCards.length === 0) {
-            console.log('No notice cards found on the page.');
-            return [];
+        const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+        progressBar.start(vacancyTypes.length, 0);
+
+        for (const type of vacancyTypes) {
+            const noticesForType = scrapeVacancyType($, type.title, type.code, districtNameMap);
+            allNotices = allNotices.concat(noticesForType);
+            progressBar.increment();
         }
 
-        console.log(`Found ${noticeCards.length} notice cards. Scraping details...`);
-
-        // 1. Create a new progress bar instance and customize its appearance
-        const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-
-        // 2. Start the progress bar with a total value of the number of cards
-        progressBar.start(noticeCards.length, 0);
-
-        noticeCards.each((index, element) => {
-            const card = $(element);
-
-            // Extract title
-            let title = card.find('.notice-header > span:first-child').text().trim().replace(/^📄\s*/, '');
-            // Extract only the district name from the title, e.g., "संत कबीर नगर" from "संत कबीर नगर – आंगनवाड़ी भर्ती विज्ञप्ति"
-            const titleParts = title.split('–');
-            if (titleParts.length > 1) {
-                title = titleParts[0].trim();
-            }
-
-            // Extract status
-            const status = card.find('.notice-badge').text().trim();
-
-            // Extract dates
-            const detailsText = card.find('.notice-details').text();
-            const uploadedDateMatch = detailsText.match(/Uploaded:\s*(\d{2}-\d{2}-\d{4})/);
-            const lastDateMatch = detailsText.match(/Last Date:\s*(\d{2}-\d{2}-\d{4})/);
-
-            const uploadedDate = uploadedDateMatch ? uploadedDateMatch[1] : null;
-            const lastDate = lastDateMatch ? lastDateMatch[1] : null;
-
-            // Extract link
-            const link = card.find('.notice-link').attr('href');
-
-            let isStillActive = false;
-            if (lastDate) {
-                // Parse date from DD-MM-YYYY format
-                const [day, month, year] = lastDate.split('-').map(Number);
-                // Note: The month is 0-indexed in JavaScript's Date constructor (0=Jan, 11=Dec)
-                const lastDateObj = new Date(year, month - 1, day);
-
-                // Get today's date, with the time portion zeroed out for a clean date-only comparison
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                isStillActive = lastDateObj >= today;
-            }
-
-            // Only include notices where the last date is today or in the future.
-            if (title && isStillActive) {
-                notices.push({
-                    title,
-                    status,
-                    uploadedDate,
-                    lastDate,
-                    link,
-                });
-            }
-            // 3. Update the progress bar on each iteration
-            progressBar.increment();
-        });
-
-        // 4. Stop the progress bar
         progressBar.stop();
-        console.log(`\nSuccessfully scraped ${notices.length} notices.`);
-        return notices;
+        console.log(`\nTotal active notices scraped: ${allNotices.length}`);
+        return allNotices;
     } catch (error) {
-        console.error('Error during scraping:', error);
-        return []; // Return an empty array in case of an error
+        console.error('Error during scraping notices:', error);
+        return [];
     }
 }
 
-// Example of how to run the scraper and log the results
-(async () => {
-    // Use dynamic import for got-scraping as it's an ESM package
+async function main() {
+    // Use dynamic import for got-scraping as it's an ESM package.
     const { gotScraping } = await import('got-scraping');
 
-    /**
-     * A pre-configured HTTP client for scraping, using got-scraping.
-     * It mimics browser headers to avoid being blocked (e.g., 403 Forbidden errors).
-     */
     const httpClient = gotScraping.extend({
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
@@ -126,21 +148,32 @@ async function scrapeNotices(httpClient) {
         },
     });
 
-    const allNotices = await scrapeNotices(httpClient);
-    if (allNotices.length > 0) {
-        console.log('--- Scraped Data ---');
-        console.log(allNotices);
-        console.log('--------------------');
-        console.log(`First notice:`, allNotices[0]);
-        console.log(`Last notice:`, allNotices[allNotices.length - 1]);
+    // Fetch districts from the database for state_id = 26 (Uttar Pradesh)
+    const districtsFromDb = await getDistrictsByState(26);
+    // Create a map from hindi_name (lowercase) to an object with the english `name` and `external_id`.
+    const districtNameMap = new Map(districtsFromDb.map(d => [
+        d.hindi_name.toLowerCase(),
+        { name: d.name, external_id: d.external_id }
+    ]));
 
-        // Save the data to a JSON file
+    const allNotices = await scrapeNotices(httpClient, districtNameMap);
+
+    if (allNotices.length > 0) {
         try {
-            const filePath = path.join(__dirname, 'up-bharti-notices.json');
-            await fs.writeFile(filePath, JSON.stringify(allNotices, null, 2));
-            console.log(`\n✅ Successfully saved ${allNotices.length} active notices to ${filePath}`);
+            await fs.mkdir(path.dirname(NOTICES_OUTPUT_JSON), { recursive: true });
+            await fs.writeFile(NOTICES_OUTPUT_JSON, JSON.stringify(allNotices, null, 2));
+            console.log(`\n✅ Successfully saved ${allNotices.length} active notices to ${NOTICES_OUTPUT_JSON}`);
         } catch (error) {
             console.error('\n❌ Error saving data to JSON file:', error);
         }
+    } else {
+        console.log('No active notices found to save.');
     }
-})();
+}
+
+if (require.main === module) {
+    main().catch((err) => {
+        console.error('Fatal error:', err);
+        process.exit(1);
+    });
+}

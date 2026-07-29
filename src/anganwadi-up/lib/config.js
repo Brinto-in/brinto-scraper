@@ -23,4 +23,7 @@ module.exports = {
   // Output path - flat JSON array, one object per anganwadi centre,
   // shaped to match the anganwadi_centres table.
   OUTPUT_JSON: require('path').join(__dirname, '../output/anganwadis-up.json'),
+
+  // Output path for the combined worker and helper vacancy notices scraper.
+  NOTICES_OUTPUT_JSON: require('path').join(__dirname, '../output/up-bharti-notices.json'),
 };
