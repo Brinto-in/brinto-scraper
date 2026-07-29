@@ -68,7 +68,7 @@ function scrapeVacancyType($, vacancyTitle, typeCode, districtNameMap) {
 
         if (finalTitle && isStillActive) {
             const notice = {
-                title: finalTitle,
+                district: finalTitle,
                 status,
                 uploadedDate,
                 lastDate,
@@ -76,7 +76,7 @@ function scrapeVacancyType($, vacancyTitle, typeCode, districtNameMap) {
                 type: typeCode,
             };
             if (externalId) {
-                notice.external_id = externalId;
+                notice.value = externalId;
             }
             notices.push(notice);
         }
