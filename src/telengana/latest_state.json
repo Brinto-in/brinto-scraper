@@ -1,0 +1,38 @@
+[
+  {
+    "s_no": 9,
+    "district": "BHADRADRI-KOTHAGUDEM",
+    "status": "Opened",
+    "startDate": "20/07/2026",
+    "closingDate": "01/08/2026",
+    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/BHADRADRI_AWH%20Vacancies_20.07.2026.pdf",
+    "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/BHADRADRI_AWHs_Notification_20.07.2026.jpeg"
+  },
+  {
+    "s_no": 14,
+    "district": "RAJANNA-SIRICILLA",
+    "status": "Opened",
+    "startDate": "28/07/2026",
+    "closingDate": "07/08/2026",
+    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/RAJANNA_SIRICILLA_VACANCIES_28.07.2026.pdf",
+    "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/RAJANNA_SIRICILLA_NOTIFICATION_28.07.2026.pdf"
+  },
+  {
+    "s_no": 20,
+    "district": "YADADRI-BHUVANGIRI",
+    "status": "Opened",
+    "startDate": "22/07/2026",
+    "closingDate": "31/07/2026",
+    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/YADADRI_VACANCIES1_22.07.2026.pdf",
+    "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/YADADRI_NOTIFICATION_22.07.2026.pdf"
+  },
+  {
+    "s_no": 21,
+    "district": "MEDCHAL - MALKAJIGIRI",
+    "status": "Opened",
+    "startDate": "27/07/2026",
+    "closingDate": "05/08/2026",
+    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/MEDCHAL_VACANCIES_27.07.2026.pdf",
+    "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/MEDCHAL_NOTIFICATION1_27.07.2026.pdf"
+  }
+]
