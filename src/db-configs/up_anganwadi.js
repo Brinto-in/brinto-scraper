@@ -1,0 +1,1 @@
+//create a reusable insert to db

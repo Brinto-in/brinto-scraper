@@ -2,10 +2,9 @@
   "name": "aww-engagement-scraper",
   "version": "1.0.0",
   "description": "Scrapes Anganwadi Engagement Portal (Odisha) active/hold/cancelled engagement ad listings into JSON/CSV.",
-  "main": "scraper.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node scraper.js",
+    "start_odisha": "node src/odisha/scraper.js",
     "start_up": "node src/anganwadi-up/scrapeAll.js"
   },
   "dependencies": {

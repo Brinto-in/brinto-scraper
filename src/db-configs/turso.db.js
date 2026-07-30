@@ -51,14 +51,31 @@ async function insertRecords(records) {
         return;
     }
 
-    console.log(`Inserting/updating ${records.length} records...`);
+    console.log(`Attempting to insert ${records.length} records...`);
     try {
         const stmts = records.map(r => ({
-            sql: `REPLACE INTO anganwadi_centres (state, district, project, gram_panchayat, external_id, center_name, center_code, reservation, area_type, raw_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            sql: `INSERT OR IGNORE INTO anganwadi_centres (state, district, project, gram_panchayat, external_id, center_name, center_code, reservation, area_type, raw_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             args: [r.state, r.district, r.project, r.gram_panchayat, r.external_id, r.center_name, r.center_code, r.reservation, r.area_type, r.raw_text],
         }));
-        await db.batch(stmts, 'write');
-        console.log('Successfully saved records to the database.');
+        const results = await db.batch(stmts, 'write');
+
+        let insertedCount = 0;
+        const skippedRecords = [];
+
+        results.forEach((result, index) => {
+            if (result.rowsAffected > 0) {
+                insertedCount++;
+            } else {
+                skippedRecords.push(records[index]);
+            }
+        });
+
+        console.log(`Successfully inserted ${insertedCount} new records.`);
+        if (skippedRecords.length > 0) {
+            console.log(`${skippedRecords.length} existing records were skipped.`);
+            // To see details of skipped records, you can uncomment the next line:
+            // console.log('Skipped records:', JSON.stringify(skippedRecords.map(r => ({ district: r.district, center_name: r.center_name, external_id: r.external_id })), null, 2));
+        }
     } catch (err) {
         console.error('Failed to insert records:', err);
         throw err;

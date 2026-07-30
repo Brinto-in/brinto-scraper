@@ -1,299 +1,299 @@
 [
   {
-    "title": "Sant Kabir Nagar",
+    "district": "Sant Kabir Nagar",
     "status": "Active",
     "uploadedDate": "29-07-2026",
     "lastDate": "20-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1785308758_56a80158.pdf",
     "type": "W",
-    "external_id": 66
+    "value": 66
   },
   {
-    "title": "Etah",
+    "district": "Etah",
     "status": "Active",
     "uploadedDate": "28-07-2026",
     "lastDate": "17-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1785244852_d03debe9.pdf",
     "type": "W",
-    "external_id": 24
+    "value": 24
   },
   {
-    "title": "Hapur",
+    "district": "Hapur",
     "status": "Active",
     "uploadedDate": "28-07-2026",
     "lastDate": "18-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1785239793_f72da20a.pdf",
     "type": "W",
-    "external_id": 35
+    "value": 35
   },
   {
-    "title": "Sitapur",
+    "district": "Sitapur",
     "status": "Active",
     "uploadedDate": "27-07-2026",
     "lastDate": "16-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1785133026_befd4efe.pdf",
     "type": "W",
-    "external_id": 71
+    "value": 71
   },
   {
-    "title": "Lakhimpur Kheri",
+    "district": "Lakhimpur Kheri",
     "status": "Active",
     "uploadedDate": "25-07-2026",
     "lastDate": "15-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784959724_946b70b5.pdf",
     "type": "W",
-    "external_id": 46
+    "value": 46
   },
   {
-    "title": "Bulandshahr",
+    "district": "Bulandshahr",
     "status": "Active",
     "uploadedDate": "24-07-2026",
     "lastDate": "14-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784897506_0da337e4.pdf",
     "type": "W",
-    "external_id": 20
+    "value": 20
   },
   {
-    "title": "Firozabad",
+    "district": "Firozabad",
     "status": "Active",
     "uploadedDate": "23-07-2026",
     "lastDate": "13-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784785976_69b83996.pdf",
     "type": "W",
-    "external_id": 28
+    "value": 28
   },
   {
-    "title": "Basti",
+    "district": "Basti",
     "status": "Active",
     "uploadedDate": "22-07-2026",
     "lastDate": "12-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784727118_48f7dc0d.pdf",
     "type": "W",
-    "external_id": 16
+    "value": 16
   },
   {
-    "title": "Saharanpur",
+    "district": "Saharanpur",
     "status": "Active",
     "uploadedDate": "22-07-2026",
     "lastDate": "12-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784708678_a0830993.pdf",
     "type": "W",
-    "external_id": 64
+    "value": 64
   },
   {
-    "title": "Ayodhya",
+    "district": "Ayodhya",
     "status": "Active",
     "uploadedDate": "21-07-2026",
     "lastDate": "11-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784634634_c02c225b.pdf",
     "type": "W",
-    "external_id": 7
+    "value": 7
   },
   {
-    "title": "Unnao",
+    "district": "Unnao",
     "status": "Active",
     "uploadedDate": "21-07-2026",
     "lastDate": "11-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784632908_d629e489.pdf",
     "type": "W",
-    "external_id": 74
+    "value": 74
   },
   {
-    "title": "Ghaziabad",
+    "district": "Ghaziabad",
     "status": "Active",
     "uploadedDate": "17-07-2026",
     "lastDate": "07-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784280600_a49885d4.pdf",
     "type": "W",
-    "external_id": 30
+    "value": 30
   },
   {
-    "title": "Raebareli",
+    "district": "Raebareli",
     "status": "Active",
     "uploadedDate": "16-07-2026",
     "lastDate": "06-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784210111_04e82bec.pdf",
     "type": "W",
-    "external_id": 62
+    "value": 62
   },
   {
-    "title": "Barabanki",
+    "district": "Barabanki",
     "status": "Active",
     "uploadedDate": "15-07-2026",
     "lastDate": "04-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784113781_5c84a50e.pdf",
     "type": "W",
-    "external_id": 14
+    "value": 14
   },
   {
-    "title": "Sultanpur",
+    "district": "Sultanpur",
     "status": "Active",
     "uploadedDate": "14-07-2026",
     "lastDate": "04-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1784035567_48325048.pdf",
     "type": "W",
-    "external_id": 73
+    "value": 73
   },
   {
-    "title": "Shahjahanpur",
+    "district": "Shahjahanpur",
     "status": "Active",
     "uploadedDate": "13-07-2026",
     "lastDate": "03-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1783933157_ae972eb6.pdf",
     "type": "W",
-    "external_id": 67
+    "value": 67
   },
   {
-    "title": "Deoria",
+    "district": "Deoria",
     "status": "Active",
     "uploadedDate": "10-07-2026",
     "lastDate": "31-07-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1783689125_894137f3.pdf",
     "type": "W",
-    "external_id": 23
+    "value": 23
   },
   {
-    "title": "Mainpuri",
+    "district": "Mainpuri",
     "status": "Active",
     "uploadedDate": "10-07-2026",
     "lastDate": "30-07-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1783679674_97fa1778.pdf",
     "type": "W",
-    "external_id": 52
+    "value": 52
   },
   {
-    "title": "Siddharthnagar",
+    "district": "Siddharthnagar",
     "status": "Active",
     "uploadedDate": "08-07-2026",
     "lastDate": "05-08-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1783511477_2ff14972.pdf",
     "type": "W",
-    "external_id": 70
+    "value": 70
   },
   {
-    "title": "Varanasi",
+    "district": "Varanasi",
     "status": "Active",
     "uploadedDate": "01-07-2026",
     "lastDate": "31-07-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1782907362_b87d5013.pdf",
     "type": "W",
-    "external_id": 75
+    "value": 75
   },
   {
-    "title": "Aligarh",
+    "district": "Aligarh",
     "status": "Active",
     "uploadedDate": "30-06-2026",
     "lastDate": "30-07-2026",
     "link": "https://upanganwadibharti.in/workernew/uploadOrder/ordercopy_1782814735_13281445.pdf",
     "type": "W",
-    "external_id": 2
+    "value": 2
   },
   {
-    "title": "Farrukhabad",
+    "district": "Farrukhabad",
     "status": "Active",
     "uploadedDate": "29-07-2026",
     "lastDate": "19-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1785318892.pdf",
     "type": "H",
-    "external_id": 26
+    "value": 26
   },
   {
-    "title": "Etah",
+    "district": "Etah",
     "status": "Active",
     "uploadedDate": "28-07-2026",
     "lastDate": "17-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1785244909.pdf",
     "type": "H",
-    "external_id": 24
+    "value": 24
   },
   {
-    "title": "Azamgarh",
+    "district": "Azamgarh",
     "status": "Active",
     "uploadedDate": "28-07-2026",
     "lastDate": "31-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1785241909.pdf",
     "type": "H",
-    "external_id": 8
+    "value": 8
   },
   {
-    "title": "Hapur",
+    "district": "Hapur",
     "status": "Active",
     "uploadedDate": "28-07-2026",
     "lastDate": "18-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1785239329.pdf",
     "type": "H",
-    "external_id": 35
+    "value": 35
   },
   {
-    "title": "Sitapur",
+    "district": "Sitapur",
     "status": "Active",
     "uploadedDate": "27-07-2026",
     "lastDate": "16-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1785133195.pdf",
     "type": "H",
-    "external_id": 71
+    "value": 71
   },
   {
-    "title": "Lakhimpur Kheri",
+    "district": "Lakhimpur Kheri",
     "status": "Active",
     "uploadedDate": "25-07-2026",
     "lastDate": "15-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1784959826.pdf",
     "type": "H",
-    "external_id": 46
+    "value": 46
   },
   {
-    "title": "Meerut",
+    "district": "Meerut",
     "status": "Active",
     "uploadedDate": "23-07-2026",
     "lastDate": "11-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1784808567.pdf",
     "type": "H",
-    "external_id": 55
+    "value": 55
   },
   {
-    "title": "Basti",
+    "district": "Basti",
     "status": "Active",
     "uploadedDate": "22-07-2026",
     "lastDate": "12-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1784727231.pdf",
     "type": "H",
-    "external_id": 16
+    "value": 16
   },
   {
-    "title": "Bhadohi",
+    "district": "Bhadohi",
     "status": "Active",
     "uploadedDate": "21-07-2026",
     "lastDate": "20-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1784625623.pdf",
     "type": "H",
-    "external_id": 17
+    "value": 17
   },
   {
-    "title": "Ghaziabad",
+    "district": "Ghaziabad",
     "status": "Active",
     "uploadedDate": "17-07-2026",
     "lastDate": "07-08-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1784281689.pdf",
     "type": "H",
-    "external_id": 30
+    "value": 30
   },
   {
-    "title": "Deoria",
+    "district": "Deoria",
     "status": "Active",
     "uploadedDate": "10-07-2026",
     "lastDate": "31-07-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1783689382.pdf",
     "type": "H",
-    "external_id": 23
+    "value": 23
   },
   {
-    "title": "Mainpuri",
+    "district": "Mainpuri",
     "status": "Active",
     "uploadedDate": "10-07-2026",
     "lastDate": "30-07-2026",
     "link": "https://upanganwadibharti.in/helper-v2/uploadOrder/ordercopy1783679774.pdf",
     "type": "H",
-    "external_id": 52
+    "value": 52
   }
 ]
