@@ -5,7 +5,7 @@
     "status": "Opened",
     "startDate": "20/07/2026",
     "closingDate": "01/08/2026",
-    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/BHADRADRI_AWH%20Vacancies_20.07.2026.pdf",
+    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/BHADRADRI_KOTHAGUDEM_AWH_VACANCIES.pdf",
     "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/BHADRADRI_AWHs_Notification_20.07.2026.jpeg"
   },
   {
@@ -34,5 +34,14 @@
     "closingDate": "05/08/2026",
     "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/MEDCHAL_VACANCIES_27.07.2026.pdf",
     "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/MEDCHAL_NOTIFICATION1_27.07.2026.pdf"
+  },
+  {
+    "s_no": 22,
+    "district": "HYDERABAD",
+    "status": "Opened",
+    "startDate": "29/07/2026",
+    "closingDate": "22/08/2026",
+    "vacanciesUrl": "https://mis.tgwdcw.in/AWTVacancies2026/HYDERABAD_VACANCIES_29.07.2026.pdf",
+    "notificationUrl": "https://mis.tgwdcw.in/AWTNotification2026/AWT_Notification_Hyderabad1_29.07.2026.pdf"
   }
 ]

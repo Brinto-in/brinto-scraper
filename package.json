@@ -9,14 +9,15 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
-    "axios": "^1.18.1",
-    "axios-cookiejar-support": "7.0.0",
+    "axios": "^1.19.0",
+    "axios-cookiejar-support": "^7.0.0",
     "cheerio": "^1.2.0",
     "cli-progress": "^3.12.0",
+    "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
     "got-scraping": "^4.2.1",
     "pdf-parse": "^2.4.5",
     "playwright": "^1.62.0",
-    "tough-cookie": "6.0.2"
+    "tough-cookie": "^6.0.2"
   }
 }

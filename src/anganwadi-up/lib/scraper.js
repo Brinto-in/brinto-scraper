@@ -8,7 +8,10 @@ const { REQUEST_DELAY_MS, UR_VALUES } = require('./config');
  */
 async function getProjects(distID) {
   const body = await postForm({ project_name: String(distID) });
+  console.log(body);
   await sleep(REQUEST_DELAY_MS);
+  console.log(parseOptions(body));
+
   return parseOptions(body);
 }
 
@@ -17,6 +20,8 @@ async function getProjects(distID) {
  * @returns {Promise<Array<{value: string, text: string}>>}
  */
 async function getGramPanchayats(projectID, distID) {
+  console.log(projectID, distID);
+
   const body = await postForm({
     gramp: '',
     projectID: String(projectID),
