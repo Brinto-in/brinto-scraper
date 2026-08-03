@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "start_odisha": "node src/odisha/scraper.js",
-    "start_up": "node src/anganwadi-up/scrapeAll.js"
+    "start_up": "node src/anganwadi-up/scrapeAll.js",
+    "start_telengana": "node src/telengana/scraper.js"
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",

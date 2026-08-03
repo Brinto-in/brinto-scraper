@@ -1,70 +1,69 @@
-const { db } = require('./turso.db.js');
+const { db } = require('./turso.db');
 
 const TABLE_NAME = 'anganwadi_vacancies';
-const CONFLICT_COLUMNS = ['state', 'district', 'project_block', 'mandal', 'sector', 'center_name'];
-const CONFLICT_WHERE = `state = 'Telangana'`; // must match the partial index below
+const CONFLICT_COLUMNS = ['center_id', 'post_code'];
 
 async function setupAnganwadiVacanciesTable() {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            state           TEXT    NOT NULL,
-            district        TEXT    NOT NULL,
-            project_block   TEXT    NOT NULL,
-            mandal          TEXT,
-            sector          TEXT,
-            area            TEXT,
-            center_name     TEXT    NOT NULL,
-            awc_id          TEXT,
-            awt             INTEGER DEFAULT 0 CHECK (awt IN (0,1)),
-            aww             INTEGER DEFAULT 0 CHECK (aww IN (0,1)),
-            awh             INTEGER DEFAULT 0 CHECK (awh IN (0,1)),
-            awh_start_date  TEXT,
-            awh_end_date    TEXT,
-            rural_urban     TEXT    CHECK (rural_urban IN ('R','U')),
-            view_doc_url    TEXT,
-            createdAt       TEXT    DEFAULT (datetime('now')),
-            updatedAt       TEXT    DEFAULT (datetime('now'))
+            center_id       INTEGER NOT NULL REFERENCES anganwadi_centers(id) ON DELETE CASCADE,
+            post_code       TEXT NOT NULL,
+            post_name       TEXT NOT NULL,
+            vacancy_count   INTEGER NOT NULL DEFAULT 0,
+            status          TEXT DEFAULT 'open',
+            start_date      TEXT,
+            end_date        TEXT,
+            createdAt       TEXT DEFAULT (datetime('now')),
+            updatedAt       TEXT DEFAULT (datetime('now'))
         );
     `);
 
     await db.execute(`
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_telangana
-        ON ${TABLE_NAME} (${CONFLICT_COLUMNS.join(', ')})
-        WHERE ${CONFLICT_WHERE};
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_vacancy_post
+        ON ${TABLE_NAME} (${CONFLICT_COLUMNS.join(', ')});
     `);
 
     console.log(`Table ${TABLE_NAME} ready.`);
 }
 
-async function upsertAnganwadiVacancies(records) {
-    if (!records?.length) return { totalAffected: 0 };
-
-    const columns = Object.keys(records[0]);
-    const placeholders = columns.map(() => '?').join(', ');
-    const updateSet = columns
-        .filter(col => !CONFLICT_COLUMNS.includes(col))
-        .map(col => `${col} = excluded.${col}`)
-        .join(', ');
+/**
+ * Upserts vacancy rows.
+ * Each entry = { center_id, post_code, post_name, vacancy_count, status, start_date, end_date }
+ */
+async function upsertVacancies(vacancies) {
+    if (!vacancies?.length) return { totalAffected: 0 };
 
     const sql = `
-        INSERT INTO ${TABLE_NAME} (${columns.join(', ')})
-        VALUES (${placeholders})
-        ON CONFLICT (${CONFLICT_COLUMNS.join(', ')}) WHERE ${CONFLICT_WHERE}
-        DO UPDATE SET ${updateSet}, updatedAt = datetime('now');
+        INSERT INTO ${TABLE_NAME} (center_id, post_code, post_name, vacancy_count, status, start_date, end_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (${CONFLICT_COLUMNS.join(', ')})
+        DO UPDATE SET
+            post_name = excluded.post_name,
+            vacancy_count = excluded.vacancy_count,
+            status = excluded.status,
+            start_date = excluded.start_date,
+            end_date = excluded.end_date,
+            updatedAt = datetime('now');
     `;
 
-    const stmts = records.map(record => ({ sql, args: Object.values(record) }));
+    const stmts = vacancies.map(v => ({
+        sql,
+        args: [
+            v.center_id,
+            v.post_code,
+            v.post_name,
+            v.vacancy_count ?? 0,
+            v.status ?? 'open',
+            v.start_date ?? null,
+            v.end_date ?? null,
+        ],
+    }));
 
-    try {
-        const results = await db.batch(stmts, 'write');
-        const totalAffected = results.reduce((sum, r) => sum + r.rowsAffected, 0);
-        console.log(`Upserted ${totalAffected} rows into ${TABLE_NAME}.`);
-        return { totalAffected };
-    } catch (err) {
-        console.error(`Upsert failed for ${TABLE_NAME}:`, err);
-        throw err;
-    }
+    const results = await db.batch(stmts, 'write');
+    const totalAffected = results.reduce((sum, r) => sum + r.rowsAffected, 0);
+    console.log(`Upserted ${totalAffected} vacancy rows.`);
+    return { totalAffected };
 }
 
-module.exports = { setupAnganwadiVacanciesTable, upsertAnganwadiVacancies };
+module.exports = { setupAnganwadiVacanciesTable, upsertVacancies };
