@@ -98,50 +98,52 @@ function compareNotifications(oldNotifs, newNotifs) {
     return changes;
 }
 
-async function main() {
-    console.log('Scraping notifications...');
+/**
+ * Fetches the latest notifications from the website and loads the previous
+ * notifications from a state file.
+ * @param {string} stateFilePath - The path to the file storing the last run's notifications.
+ * @returns {Promise<{oldNotifications: Array, newNotifications: Array}>}
+ */
+async function getNotificationStates(stateFilePath) {
+    console.log('Scraping for new notifications...');
     const newNotifications = await scrapeNotifications();
 
     if (!newNotifications) {
-        console.log('Scraping failed, cannot check for changes.');
-        return;
+        throw new Error('Scraping failed, cannot retrieve new notifications.');
     }
 
-    let previousNotifications = [];
+    let oldNotifications = [];
     try {
         const previousState = await fs.readFile(stateFilePath, 'utf-8');
-        previousNotifications = JSON.parse(previousState);
-        console.log(`Loaded ${previousNotifications.length} notifications from the last run.`);
+        oldNotifications = JSON.parse(previousState);
+        console.log(`Loaded ${oldNotifications.length} notifications from the last run.`);
     } catch (error) {
         if (error.code === 'ENOENT') {
             console.log('No previous state file found. This must be the first run.');
         } else {
             console.error('Error reading previous state file:', error);
+            // Proceed with an empty oldNotifications array on read error
         }
     }
+    return { oldNotifications, newNotifications };
+}
 
-    const changes = compareNotifications(previousNotifications, newNotifications);
-
-    if (changes.added.length === 0 && changes.removed.length === 0 && changes.updated.length === 0) {
-        console.log('No changes detected since the last run.');
-    } else {
-        console.log('\n--- Changes Detected ---');
-        if (changes.added.length > 0) {
-            console.log(`\n[+] ${changes.added.length} Added Notifications:`);
-            console.log(JSON.stringify(changes.added, null, 2));
-        }
-        if (changes.removed.length > 0) {
-            console.log(`\n[-] ${changes.removed.length} Removed Notifications:`);
-            console.log(JSON.stringify(changes.removed, null, 2));
-        }
-        if (changes.updated.length > 0) {
-            console.log(`\n[*] ${changes.updated.length} Updated Notifications:`);
-            console.log(JSON.stringify(changes.updated, null, 2));
-        }
-        console.log('------------------------\n');
-    }
-
+async function main() {
     try {
+        const { oldNotifications, newNotifications } = await getNotificationStates(stateFilePath);
+
+        const changes = compareNotifications(oldNotifications, newNotifications);
+
+        if (changes.added.length === 0 && changes.removed.length === 0 && changes.updated.length === 0) {
+            console.log('No changes detected since the last run.');
+        } else {
+            console.log('\n--- Changes Detected ---');
+            if (changes.added.length > 0) console.log(`\n[+] ${changes.added.length} Added Notifications:\n`, JSON.stringify(changes.added, null, 2));
+            if (changes.removed.length > 0) console.log(`\n[-] ${changes.removed.length} Removed Notifications:\n`, JSON.stringify(changes.removed, null, 2));
+            if (changes.updated.length > 0) console.log(`\n[*] ${changes.updated.length} Updated Notifications:\n`, JSON.stringify(changes.updated, null, 2));
+            console.log('------------------------\n');
+        }
+
         await fs.writeFile(stateFilePath, JSON.stringify(newNotifications, null, 2), 'utf-8');
         console.log(`Successfully updated the state file at: ${stateFilePath}`);
     } catch (error) {
@@ -149,4 +151,13 @@ async function main() {
     }
 }
 
-main();
+// This allows the script to be run directly, but also to be imported as a module.
+if (require.main === module) {
+    main().catch(err => console.error('An error occurred in the main process:', err));
+}
+
+module.exports = {
+    getNotificationStates,
+    compareNotifications,
+    scrapeNotifications
+};
