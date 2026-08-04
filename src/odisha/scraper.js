@@ -145,7 +145,7 @@ function extractCsrf(html) {
   return null;
 }
 
-async function getCsrfToken(html) {
+async function resolveCsrfToken(html) {
   const extracted = extractCsrf(html);
   if (extracted) return extracted;
   const cookies = await jar.getCookies(BASE_URL);
@@ -153,16 +153,16 @@ async function getCsrfToken(html) {
   return xsrfCookie ? xsrfCookie.value : "";
 }
 
-async function bootstrapSession() {
-  console.log(`[bootstrap] GET ${AWW_LIST_URL}`);
+async function initializeSession() {
+  console.log(`[session] Initializing session by GET ${AWW_LIST_URL}`);
   const res = await client.get(AWW_LIST_URL);
   if (res.status >= 400) {
     throw new Error(
       `Bootstrap GET failed with status ${res.status}.`
     );
   }
-  const csrf = await getCsrfToken(res.data);
-  console.log(`[bootstrap] got CSRF token: "${csrf}"`);
+  const csrf = await resolveCsrfToken(res.data);
+  console.log(`[session] Initial CSRF token resolved: "${csrf}"`);
   return csrf;
 }
 
@@ -175,7 +175,7 @@ function parseEventIdFromHref(href) {
   return m ? m[1] : null;
 }
 
-function parseTable(html, meta) {
+function parseResultsTable(html, meta) {
   const $ = cheerio.load(html);
   const rows = [];
 
@@ -223,8 +223,8 @@ function parseTable(html, meta) {
 // ---------------------------------------------------------------------
 // Single search request
 // ---------------------------------------------------------------------
-async function fetchPage({ csrf, districtId, isAwwValue, tabValue, page, size, searchTerm = "" }) {
-  const currentCsrf = csrf || (await getCsrfToken());
+async function fetchResultsPage({ csrf, districtId, isAwwValue, tabValue, page, size, searchTerm = "" }) {
+  const currentCsrf = csrf || (await resolveCsrfToken());
 
   const body = new URLSearchParams({
     _csrf: currentCsrf,
@@ -249,7 +249,7 @@ async function fetchPage({ csrf, districtId, isAwwValue, tabValue, page, size, s
     throw new Error(`POST failed (${res.status}) for district=${districtId} tab=${tabValue} for=${isAwwValue}`);
   }
 
-  const newCsrf = (await getCsrfToken(res.data)) || currentCsrf;
+  const newCsrf = (await resolveCsrfToken(res.data)) || currentCsrf;
   return { html: res.data, csrf: newCsrf };
 }
 
@@ -322,9 +322,9 @@ async function syncRecordsToApi(rows) {
 // Main
 // ---------------------------------------------------------------------
 async function main() {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  // fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  let csrf = await bootstrapSession();
+  let csrf = await initializeSession();
   const allRows = [];
   const errors = [];
 
@@ -333,7 +333,7 @@ async function main() {
       for (const tab of TABS) {
         try {
           console.log(`[fetch] district=${district.name} for=${forValue} tab=${tab.label}`);
-          const { html, csrf: newCsrf } = await fetchPage({
+          const { html, csrf: newCsrf } = await fetchResultsPage({
             csrf,
             districtId: district.id,
             isAwwValue: forValue,
@@ -343,7 +343,7 @@ async function main() {
           });
           csrf = newCsrf;
 
-          const { rows, totalPages } = parseTable(html, {
+          const { rows, totalPages } = parseResultsTable(html, {
             tabLabel: tab.label,
             districtName: district.name,
             isAwwValue: forValue,
@@ -365,26 +365,17 @@ async function main() {
     }
   }
 
-  const jsonPath = path.join(OUTPUT_DIR, "aww-events.json");
-  const csvPath = path.join(OUTPUT_DIR, "aww-events.csv");
+  console.log(`\nScraping complete. Found ${allRows.length} rows.`);
 
-  fs.writeFileSync(jsonPath, JSON.stringify(allRows, null, 2), "utf8");
-  fs.writeFileSync(csvPath, toCsv(allRows), "utf8");
-
-  console.log(`\nDone. ${allRows.length} rows written.`);
-  console.log(`  JSON: ${jsonPath}`);
-  console.log(`  CSV:  ${csvPath}`);
   if (errors.length) {
-    const errPath = path.join(OUTPUT_DIR, "errors.json");
-    fs.writeFileSync(errPath, JSON.stringify(errors, null, 2), "utf8");
-    console.log(`  ${errors.length} requests failed — see ${errPath}`);
+    console.log(`There were ${errors.length} requests that failed during the process.`);
+    // const errPath = path.join(OUTPUT_DIR, "errors.json");
+    // fs.writeFileSync(errPath, JSON.stringify(errors, null, 2), "utf8");
+    // console.log(`  ${errors.length} requests failed — see ${errPath}`);
   }
 
   // Push synced records to API
   await syncRecordsToApi(allRows);
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err.message);
-  process.exit(1);
-});
+module.exports = { main };
