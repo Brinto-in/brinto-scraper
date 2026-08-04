@@ -2,91 +2,109 @@
   {
     "value": "7",
     "name": "Ayodhya",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566661"
   },
   {
     "value": "14",
     "name": "Barabanki",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566662"
   },
   {
     "value": "16",
     "name": "Basti",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566663"
   },
   {
     "value": "20",
     "name": "Bulandshahr",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566664"
   },
   {
     "value": "24",
     "name": "Etah",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566665"
   },
   {
     "value": "28",
     "name": "Firozabad",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566667"
   },
   {
     "value": "30",
     "name": "Ghaziabad",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566668"
   },
   {
     "value": "35",
     "name": "Hapur",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566669"
   },
   {
     "value": "47",
     "name": "Kushinagar",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566670"
   },
   {
     "value": "46",
     "name": "Lakhimpur Kheri",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566671"
   },
   {
     "value": "62",
     "name": "Raebareli",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566672"
   },
   {
     "value": "64",
     "name": "Saharanpur",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566673"
   },
   {
     "value": "66",
     "name": "Sant Kabir Nagar",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566674"
   },
   {
     "value": "67",
     "name": "Shahjahanpur",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566675"
   },
   {
     "value": "70",
     "name": "Siddharthnagar",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566676"
   },
   {
     "value": "71",
     "name": "Sitapur",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566677"
   },
   {
     "value": "73",
     "name": "Sultanpur",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566678"
   },
   {
     "value": "74",
     "name": "Unnao",
-    "status": "active"
+    "status": "active",
+    "mobile": "5555566679"
   }
 ]

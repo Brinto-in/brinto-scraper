@@ -1,0 +1,912 @@
+{
+  "AYODHYA": [
+    {
+      "value": "68",
+      "name": "AMANIGANJ"
+    },
+    {
+      "value": "69",
+      "name": "AYODHYA CITY"
+    },
+    {
+      "value": "70",
+      "name": "BIKAPUR"
+    },
+    {
+      "value": "71",
+      "name": "HARINGTONGANJ"
+    },
+    {
+      "value": "72",
+      "name": "MASAUDHA"
+    },
+    {
+      "value": "73",
+      "name": "MAWAI"
+    },
+    {
+      "value": "74",
+      "name": "MAYA BAZAR"
+    },
+    {
+      "value": "75",
+      "name": "MILKIPUR"
+    },
+    {
+      "value": "76",
+      "name": "PURA BAZAR"
+    },
+    {
+      "value": "77",
+      "name": "RUDAULI"
+    },
+    {
+      "value": "78",
+      "name": "SOHAWAL"
+    },
+    {
+      "value": "79",
+      "name": "TARUN"
+    }
+  ],
+  "Barabanki": [
+    {
+      "value": "163",
+      "name": "BANIKODAR"
+    },
+    {
+      "value": "162",
+      "name": "BANKI"
+    },
+    {
+      "value": "164",
+      "name": "BARABANKI CITY"
+    },
+    {
+      "value": "165",
+      "name": "DARIYABAD"
+    },
+    {
+      "value": "166",
+      "name": "DEWA"
+    },
+    {
+      "value": "167",
+      "name": "FATHEPUR"
+    },
+    {
+      "value": "168",
+      "name": "HAIDERGARH"
+    },
+    {
+      "value": "169",
+      "name": "HARKHA"
+    },
+    {
+      "value": "170",
+      "name": "MASAULI"
+    },
+    {
+      "value": "171",
+      "name": "NINDURA"
+    },
+    {
+      "value": "172",
+      "name": "PUREDALAI"
+    },
+    {
+      "value": "173",
+      "name": "RAM NAGAR"
+    },
+    {
+      "value": "174",
+      "name": "SIDHAUR"
+    },
+    {
+      "value": "175",
+      "name": "SIROULIGOUSPUR"
+    },
+    {
+      "value": "176",
+      "name": "SUARATGANJ"
+    },
+    {
+      "value": "177",
+      "name": "TRIVEDIGANJ"
+    }
+  ],
+  "Basti": [
+    {
+      "value": "194",
+      "name": "BAHADURPUR"
+    },
+    {
+      "value": "195",
+      "name": "BANKATI"
+    },
+    {
+      "value": "196",
+      "name": "BASTI CITY"
+    },
+    {
+      "value": "197",
+      "name": "DUBAULIYA"
+    },
+    {
+      "value": "198",
+      "name": "GAUR"
+    },
+    {
+      "value": "199",
+      "name": "HARRIYA"
+    },
+    {
+      "value": "200",
+      "name": "KAPTANGANJ"
+    },
+    {
+      "value": "201",
+      "name": "KUDRAHA"
+    },
+    {
+      "value": "202",
+      "name": "PARASRAMPUR"
+    },
+    {
+      "value": "203",
+      "name": "RAM NAGAR"
+    },
+    {
+      "value": "204",
+      "name": "RUDHAULI"
+    },
+    {
+      "value": "205",
+      "name": "SADAR"
+    },
+    {
+      "value": "206",
+      "name": "SALTAUA GOPALUR"
+    },
+    {
+      "value": "207",
+      "name": "SAUGHAT"
+    },
+    {
+      "value": "208",
+      "name": "VIKRAMJOT"
+    }
+  ],
+  "Bulandshahr": [
+    {
+      "value": "245",
+      "name": "AGAUTA"
+    },
+    {
+      "value": "246",
+      "name": "ANOOPSHAHR"
+    },
+    {
+      "value": "247",
+      "name": "ARNIYA"
+    },
+    {
+      "value": "248",
+      "name": "BB NAGAR"
+    },
+    {
+      "value": "249",
+      "name": "BULANDSHAHR"
+    },
+    {
+      "value": "250",
+      "name": "DANPUR"
+    },
+    {
+      "value": "251",
+      "name": "DIBAI"
+    },
+    {
+      "value": "252",
+      "name": "GULAOTHI"
+    },
+    {
+      "value": "253",
+      "name": "JAHANGIRABAD"
+    },
+    {
+      "value": "254",
+      "name": "KHURJA"
+    },
+    {
+      "value": "255",
+      "name": "LAKHAOTI"
+    },
+    {
+      "value": "256",
+      "name": "PAHASU"
+    },
+    {
+      "value": "257",
+      "name": "SHIKARPUR"
+    },
+    {
+      "value": "258",
+      "name": "SIKANDRABAD"
+    },
+    {
+      "value": "259",
+      "name": "SIYANA"
+    },
+    {
+      "value": "260",
+      "name": "UNCHAGAON"
+    }
+  ],
+  "Etah": [
+    {
+      "value": "294",
+      "name": "ALIGANJ"
+    },
+    {
+      "value": "295",
+      "name": "AWAGARH"
+    },
+    {
+      "value": "296",
+      "name": "JAITHRA"
+    },
+    {
+      "value": "297",
+      "name": "JALESAR"
+    },
+    {
+      "value": "298",
+      "name": "MARHARA"
+    },
+    {
+      "value": "299",
+      "name": "NIDHAULI KLAN"
+    },
+    {
+      "value": "300",
+      "name": "SAKEET"
+    },
+    {
+      "value": "301",
+      "name": "SHEETALPUR"
+    },
+    {
+      "value": "302",
+      "name": "URBAN ETAH"
+    }
+  ],
+  "Firozabad": [
+    {
+      "value": "334",
+      "name": "ARAON"
+    },
+    {
+      "value": "336",
+      "name": "FIROZABAD CITY 1"
+    },
+    {
+      "value": "338",
+      "name": "FZD GRAMIN"
+    },
+    {
+      "value": "339",
+      "name": "JASRANA"
+    },
+    {
+      "value": "343",
+      "name": "SHIKOHABAD"
+    }
+  ],
+  "Ghaziabad": [
+    {
+      "value": "350",
+      "name": "BHOJPUR"
+    },
+    {
+      "value": "351",
+      "name": "GHAZIABAD CITY"
+    },
+    {
+      "value": "352",
+      "name": "LONI"
+    },
+    {
+      "value": "353",
+      "name": "MURADNAGAR"
+    },
+    {
+      "value": "354",
+      "name": "RAZAPUR"
+    }
+  ],
+  "Hapur": [
+    {
+      "value": "417",
+      "name": "DHAULANA"
+    },
+    {
+      "value": "418",
+      "name": "GARHMUKTESHWER"
+    },
+    {
+      "value": "419",
+      "name": "HAPUR"
+    },
+    {
+      "value": "420",
+      "name": "SIMBHAWLI"
+    }
+  ],
+  "Kushinagar": [
+    {
+      "value": "538",
+      "name": "DUDHAHI"
+    },
+    {
+      "value": "539",
+      "name": "FAZILNAGAR"
+    },
+    {
+      "value": "540",
+      "name": "HATA"
+    },
+    {
+      "value": "541",
+      "name": "KAPTANGANJ"
+    },
+    {
+      "value": "542",
+      "name": "KASAYA"
+    },
+    {
+      "value": "543",
+      "name": "KHADDA"
+    },
+    {
+      "value": "544",
+      "name": "KUSHI NAGAR CITY"
+    },
+    {
+      "value": "545",
+      "name": "MOTICHAK"
+    },
+    {
+      "value": "546",
+      "name": "NEBUA NAURANGIYA"
+    },
+    {
+      "value": "547",
+      "name": "PADRAUNA"
+    },
+    {
+      "value": "548",
+      "name": "RAMKOLA"
+    },
+    {
+      "value": "549",
+      "name": "SEORAHI"
+    },
+    {
+      "value": "550",
+      "name": "SUKRAULI"
+    },
+    {
+      "value": "551",
+      "name": "TAMKUHIRAJ"
+    },
+    {
+      "value": "552",
+      "name": "VISHUNPURA"
+    }
+  ],
+  "Lakhimpur Kheri": [
+    {
+      "value": "553",
+      "name": "BANKEYGANJ"
+    },
+    {
+      "value": "554",
+      "name": "BEHJAM"
+    },
+    {
+      "value": "555",
+      "name": "BIJUA"
+    },
+    {
+      "value": "556",
+      "name": "DHAURHARA"
+    },
+    {
+      "value": "557",
+      "name": "ISANAGAR"
+    },
+    {
+      "value": "558",
+      "name": "KUMBHI GOLA"
+    },
+    {
+      "value": "559",
+      "name": "LAKHIMPUR GRAMIN"
+    },
+    {
+      "value": "560",
+      "name": "LAKHIMPUR KHERI CITY"
+    },
+    {
+      "value": "561",
+      "name": "MITAULI"
+    },
+    {
+      "value": "562",
+      "name": "MOHAMMDI"
+    },
+    {
+      "value": "563",
+      "name": "NAKHA"
+    },
+    {
+      "value": "564",
+      "name": "NIGHASAN"
+    },
+    {
+      "value": "565",
+      "name": "PALIA KALAN"
+    },
+    {
+      "value": "566",
+      "name": "PASSGAWAN"
+    },
+    {
+      "value": "567",
+      "name": "PHOOLBEHAR"
+    },
+    {
+      "value": "568",
+      "name": "RAMIYA BEHAR"
+    }
+  ],
+  "Raebareli": [
+    {
+      "value": "729",
+      "name": "AMAVA"
+    },
+    {
+      "value": "730",
+      "name": "BACHHRAWAN"
+    },
+    {
+      "value": "731",
+      "name": "CHHATOH"
+    },
+    {
+      "value": "732",
+      "name": "DALMAU"
+    },
+    {
+      "value": "733",
+      "name": "DEEH"
+    },
+    {
+      "value": "734",
+      "name": "DEENSHAH GAURA"
+    },
+    {
+      "value": "735",
+      "name": "HARCHANDPUR"
+    },
+    {
+      "value": "736",
+      "name": "JAGATPUR"
+    },
+    {
+      "value": "737",
+      "name": "KHEERON"
+    },
+    {
+      "value": "738",
+      "name": "LALGANJ"
+    },
+    {
+      "value": "739",
+      "name": "MAHRAJGANJ"
+    },
+    {
+      "value": "740",
+      "name": "RAEBARELI CITY"
+    },
+    {
+      "value": "741",
+      "name": "RAHI"
+    },
+    {
+      "value": "742",
+      "name": "ROHANIYA"
+    },
+    {
+      "value": "743",
+      "name": "SALON"
+    },
+    {
+      "value": "744",
+      "name": "SARENI"
+    },
+    {
+      "value": "745",
+      "name": "SATOVN"
+    },
+    {
+      "value": "747",
+      "name": "UNCHAHAR"
+    }
+  ],
+  "Saharanpur": [
+    {
+      "value": "756",
+      "name": "BALIYA KHERI"
+    },
+    {
+      "value": "757",
+      "name": "DEOBAND"
+    },
+    {
+      "value": "758",
+      "name": "GANGOH"
+    },
+    {
+      "value": "759",
+      "name": "MANIHARAN"
+    },
+    {
+      "value": "760",
+      "name": "MUZAFFARABAD"
+    },
+    {
+      "value": "761",
+      "name": "NAGAL"
+    },
+    {
+      "value": "762",
+      "name": "NAKUR"
+    },
+    {
+      "value": "763",
+      "name": "NANAUTA"
+    },
+    {
+      "value": "764",
+      "name": "PUNWARKA"
+    },
+    {
+      "value": "765",
+      "name": "SADHAULI KADEEM"
+    },
+    {
+      "value": "766",
+      "name": "SAHARANPUR CITY"
+    },
+    {
+      "value": "767",
+      "name": "SARSAWA"
+    }
+  ],
+  "Sant Kabir Nagar": [
+    {
+      "value": "776",
+      "name": "BAGHAULI"
+    },
+    {
+      "value": "777",
+      "name": "BELHARKALA"
+    },
+    {
+      "value": "778",
+      "name": "HAISAR BAZAR"
+    },
+    {
+      "value": "779",
+      "name": "KHALILABAD"
+    },
+    {
+      "value": "780",
+      "name": "MEHDAWAL"
+    },
+    {
+      "value": "781",
+      "name": "NATH NAGAR"
+    },
+    {
+      "value": "782",
+      "name": "PAULI"
+    },
+    {
+      "value": "783",
+      "name": "SANT KABIR NAGAR CITY"
+    },
+    {
+      "value": "784",
+      "name": "SANTHA"
+    },
+    {
+      "value": "785",
+      "name": "SEMARI YAWAN"
+    }
+  ],
+  "Siddharthnagar": [
+    {
+      "value": "813",
+      "name": "BANSI"
+    },
+    {
+      "value": "814",
+      "name": "BARHANI"
+    },
+    {
+      "value": "815",
+      "name": "BHANWAPUR"
+    },
+    {
+      "value": "816",
+      "name": "BIRDPUR"
+    },
+    {
+      "value": "817",
+      "name": "DUMARIYAGANJ"
+    },
+    {
+      "value": "818",
+      "name": "ITWA"
+    },
+    {
+      "value": "819",
+      "name": "JOGIYA"
+    },
+    {
+      "value": "820",
+      "name": "KHESRAHA"
+    },
+    {
+      "value": "821",
+      "name": "KHUNIYAW"
+    },
+    {
+      "value": "822",
+      "name": "LOTAN"
+    },
+    {
+      "value": "823",
+      "name": "MITHWAL"
+    },
+    {
+      "value": "824",
+      "name": "NAUGARH"
+    },
+    {
+      "value": "825",
+      "name": "SHORATGARH"
+    },
+    {
+      "value": "826",
+      "name": "SIDDHARTH NAGAR CITY"
+    },
+    {
+      "value": "827",
+      "name": "USKA BAZAR"
+    }
+  ],
+  "Sitapur": [
+    {
+      "value": "828",
+      "name": "ALIYA"
+    },
+    {
+      "value": "829",
+      "name": "BEHTA"
+    },
+    {
+      "value": "830",
+      "name": "BISWAN"
+    },
+    {
+      "value": "831",
+      "name": "GONDLAMAU"
+    },
+    {
+      "value": "832",
+      "name": "HARGAO"
+    },
+    {
+      "value": "833",
+      "name": "KASMANDA"
+    },
+    {
+      "value": "834",
+      "name": "KHERABAD"
+    },
+    {
+      "value": "835",
+      "name": "LAHARPUR"
+    },
+    {
+      "value": "836",
+      "name": "MACHHERATA"
+    },
+    {
+      "value": "837",
+      "name": "MAHMUDABAD"
+    },
+    {
+      "value": "838",
+      "name": "MAHOLI"
+    },
+    {
+      "value": "839",
+      "name": "MISRIKH"
+    },
+    {
+      "value": "840",
+      "name": "PAHALA"
+    },
+    {
+      "value": "841",
+      "name": "PARSENDI"
+    },
+    {
+      "value": "842",
+      "name": "PISAWAN"
+    },
+    {
+      "value": "843",
+      "name": "RAMPUR MATHURA"
+    },
+    {
+      "value": "844",
+      "name": "REWSA"
+    },
+    {
+      "value": "845",
+      "name": "SAKRAN"
+    },
+    {
+      "value": "846",
+      "name": "SIDHAULI"
+    },
+    {
+      "value": "847",
+      "name": "SITAPUR CITY"
+    }
+  ],
+  "Sultanpur": [
+    {
+      "value": "857",
+      "name": "AKHANDNAGAR"
+    },
+    {
+      "value": "858",
+      "name": "BALDIRAI"
+    },
+    {
+      "value": "859",
+      "name": "BHADAIYA"
+    },
+    {
+      "value": "860",
+      "name": "DHANPATGANJ"
+    },
+    {
+      "value": "861",
+      "name": "DOSTPUR"
+    },
+    {
+      "value": "862",
+      "name": "DUBEPUR"
+    },
+    {
+      "value": "863",
+      "name": "JAISINGHPUR"
+    },
+    {
+      "value": "864",
+      "name": "KADIPUR"
+    },
+    {
+      "value": "865",
+      "name": "KUREBHAR"
+    },
+    {
+      "value": "866",
+      "name": "KURWAR"
+    },
+    {
+      "value": "867",
+      "name": "LAMBHUA"
+    },
+    {
+      "value": "868",
+      "name": "MOTIGARPUR"
+    },
+    {
+      "value": "869",
+      "name": "P P KAMAICHA"
+    },
+    {
+      "value": "870",
+      "name": "SULTANPUR CITY"
+    }
+  ],
+  "Unnao": [
+    {
+      "value": "871",
+      "name": "ASOHA"
+    },
+    {
+      "value": "872",
+      "name": "AURAS"
+    },
+    {
+      "value": "873",
+      "name": "BANGARMAU"
+    },
+    {
+      "value": "874",
+      "name": "BICHIYA"
+    },
+    {
+      "value": "875",
+      "name": "BIGHAPUR"
+    },
+    {
+      "value": "876",
+      "name": "FATEHPUR - 84"
+    },
+    {
+      "value": "877",
+      "name": "GANJMURADABAD"
+    },
+    {
+      "value": "878",
+      "name": "HASANGANJ"
+    },
+    {
+      "value": "879",
+      "name": "HILOWLI"
+    },
+    {
+      "value": "880",
+      "name": "MIYAGANJ"
+    },
+    {
+      "value": "881",
+      "name": "NAWABAGNJ"
+    },
+    {
+      "value": "882",
+      "name": "PURWA"
+    },
+    {
+      "value": "883",
+      "name": "S.KARAN"
+    },
+    {
+      "value": "884",
+      "name": "S.SAROSI"
+    },
+    {
+      "value": "885",
+      "name": "SAFIPUR"
+    },
+    {
+      "value": "886",
+      "name": "SUMERPUR"
+    },
+    {
+      "value": "887",
+      "name": "UNNAO CITY"
+    }
+  ]
+}

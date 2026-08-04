@@ -1,50 +1,66 @@
 [
   {
-    "value": "68",
-    "name": "AMANIGANJ"
+    "value": "245",
+    "name": "AGAUTA"
   },
   {
-    "value": "69",
-    "name": "AYODHYA CITY"
+    "value": "246",
+    "name": "ANOOPSHAHR"
   },
   {
-    "value": "70",
-    "name": "BIKAPUR"
+    "value": "247",
+    "name": "ARNIYA"
   },
   {
-    "value": "71",
-    "name": "HARINGTONGANJ"
+    "value": "248",
+    "name": "BB NAGAR"
   },
   {
-    "value": "72",
-    "name": "MASAUDHA"
+    "value": "249",
+    "name": "BULANDSHAHR"
   },
   {
-    "value": "73",
-    "name": "MAWAI"
+    "value": "250",
+    "name": "DANPUR"
   },
   {
-    "value": "74",
-    "name": "MAYA BAZAR"
+    "value": "251",
+    "name": "DIBAI"
   },
   {
-    "value": "75",
-    "name": "MILKIPUR"
+    "value": "252",
+    "name": "GULAOTHI"
   },
   {
-    "value": "76",
-    "name": "PURA BAZAR"
+    "value": "253",
+    "name": "JAHANGIRABAD"
   },
   {
-    "value": "77",
-    "name": "RUDAULI"
+    "value": "254",
+    "name": "KHURJA"
   },
   {
-    "value": "78",
-    "name": "SOHAWAL"
+    "value": "255",
+    "name": "LAKHAOTI"
   },
   {
-    "value": "79",
-    "name": "TARUN"
+    "value": "256",
+    "name": "PAHASU"
+  },
+  {
+    "value": "257",
+    "name": "SHIKARPUR"
+  },
+  {
+    "value": "258",
+    "name": "SIKANDRABAD"
+  },
+  {
+    "value": "259",
+    "name": "SIYANA"
+  },
+  {
+    "value": "260",
+    "name": "UNCHAGAON"
   }
 ]
