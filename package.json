@@ -6,7 +6,8 @@
   "scripts": {
     "start_odisha": "node src/odisha/scraper.js",
     "start_up": "node src/anganwadi-up/scrapeAll.js",
-    "start_telengana": "node src/telengana/scrapurl.js"
+    "start_telengana": "node src/telengana/scrapurl.js",
+    "start:heartbeat": "pm2 start src/index.js --name \"heartbeat-logger\""
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
@@ -14,11 +15,13 @@
     "axios-cookiejar-support": "^7.0.0",
     "cheerio": "^1.2.0",
     "cli-progress": "^3.12.0",
+    "cron": "^4.4.0",
     "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
     "got-scraping": "^4.2.1",
     "pdf-parse": "^2.4.5",
-    "playwright": "^1.62.0",
+    "playwright": "^1.62.1",
+    "pm2": "^7.0.3",
     "tough-cookie": "^6.0.2"
   }
 }
