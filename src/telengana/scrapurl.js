@@ -246,7 +246,7 @@ async function main() {
         const { districts } = await getDistrictsForPost(post.value);
         console.log(`  Districts found: ${districts.length}`);
 
-        const oneDistrict = districts.slice(0, 1);
+        const oneDistrict = districts//.slice(0, 1);
         // const secondDistrict = districts.slice(1, 2);
         // const thirdDistrict = districts.slice(2, 3);
         // const fourthDistrict = districts.slice(3, 4);

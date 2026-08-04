@@ -20,13 +20,13 @@ const REQUEST_DELAY_MS = 500; // Delay between requests to be polite
  * @param {object} session - The session object for a district.
  * @param {string} session.districtName - The name of the district.
  * @param {string} session.cfClearanceToken - The Cloudflare clearance token.
- * @param {string} session.sessionId - The PHPSESSID token.
- * @returns {Promise<Array<object>>} A promise that resolves to an array of project objects.
+ * @param {string} session.sessionId - The PHPSESSID token. 
+ * @returns {Promise<{district: {name: string, value: string}|null, projects: Array<object>}>} A promise that resolves to an object containing the scraped district and its projects.
  */
 async function fetchProjectsForDistrict(httpClient, { districtName, cfClearanceToken, sessionId }) {
     const url = 'https://upanganwadibharti.in/workernew/users/step-1.php';
 
-    // Combine the tokens into a single 'Cookie' header string.
+    // Combine the tokens into a single 'Cookie' header string. 
     const cookieHeader = `cf_clearance=${cfClearanceToken}; PHPSESSID=${sessionId}`;
 
     console.log(`\nFetching projects for district: ${districtName}`);
@@ -44,6 +44,19 @@ async function fetchProjectsForDistrict(httpClient, { districtName, cfClearanceT
 
         // --- Parse the HTML to extract projects ---
         const $ = cheerio.load(response.body);
+
+        // --- Extract district information from the page ---
+        const districtOption = $('select#district option[value!=""]').first();
+        let district = null;
+        if (districtOption.length) {
+            district = {
+                name: districtOption.text().trim(),
+                value: districtOption.attr('value'),
+            };
+            console.log(`Scraped district from page: ${district.name} (ID: ${district.value})`);
+        } else {
+            console.warn(`Warning: Could not find a valid district in the dropdown for session: ${districtName}.`);
+        }
 
         const projects = [];
         // Select the dropdown with id 'project' and iterate over its options
@@ -63,11 +76,11 @@ async function fetchProjectsForDistrict(httpClient, { districtName, cfClearanceT
         } else {
             console.warn(`Warning: No projects found for ${districtName}. The session might be invalid/expired or the page structure may have changed.`);
         }
-        return projects;
+        return { district, projects };
 
     } catch (error) {
         console.error(`Failed to fetch or process page for ${districtName}:`, error.message);
-        return []; // Return empty array on failure to not stop the whole process
+        return { district: null, projects: [] }; // Return empty object on failure
     }
 }
 
@@ -84,8 +97,10 @@ async function main() {
     const allProjectsByDistrict = {};
 
     for (const session of districtSessions) {
-        const projects = await fetchProjectsForDistrict(httpClient, session);
-        allProjectsByDistrict[session.districtName] = projects;
+        const { district, projects } = await fetchProjectsForDistrict(httpClient, session);
+        if (district && district.name) {
+            allProjectsByDistrict[district.name] = { districtValue: district.value, projects };
+        }
 
         // Add a delay to avoid overwhelming the server
         await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY_MS));
