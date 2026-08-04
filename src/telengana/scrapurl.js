@@ -352,7 +352,11 @@ async function main() {
     console.log(`\nDone. Centers upserted: ${centersUpserted}, Vacancies upserted: ${vacanciesUpserted}, Failures: ${failures}`);
 }
 
-main().catch(err => {
-    console.error('Fatal error:', err.message);
-    process.exit(1);
-});
+if (require.main === module) {
+    main().catch(err => {
+        console.error('Fatal error:', err.message);
+        process.exit(1);
+    });
+}
+
+module.exports = { main };
