@@ -8,6 +8,7 @@ const { URLSearchParams } = require('url');
 
 const { setupAnganwadiCentersTable, upsertCenter } = require('../db-configs/anganwadi_centers.js');
 const { setupAnganwadiVacanciesTable, upsertVacancies } = require('../db-configs/anganwadi_vacancies.js');
+const { scrapeNotifications } = require('./scraper.js');
 
 const BASE_URL = 'https://mis.tgwdcw.in';
 const PAGE_URL = `${BASE_URL}/Recruit_Inter.aspx`;
@@ -41,6 +42,18 @@ const COMMON_HEADERS = {
     'x-requested-with': 'XMLHttpRequest',
 };
 
+// ---------- Date helper ----------
+
+/**
+ * Converts a date string from DD/MM/YYYY to YYYY-MM-DD format.
+ * @param {string | null} dateStr The date string to convert.
+ * @returns {string | null} The formatted date string, or null if input is invalid.
+ */
+function formatToISODate(dateStr) {
+    if (!dateStr || !/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return null;
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month}-${day}`;
+}
 // ---------- HTML / delta parsing helpers ----------
 
 function getHiddenFields($) {
@@ -225,7 +238,16 @@ async function main() {
     await setupAnganwadiCentersTable();
     await setupAnganwadiVacanciesTable();
 
-    console.log(`[1] Loading initial page: ${PAGE_URL}`);
+    console.log('[1] Fetching notifications for start/end dates...');
+    const notifications = await scrapeNotifications();
+    if (!notifications) {
+        throw new Error("Could not fetch notifications from scraper.js, cannot proceed.");
+    }
+    // Create a map for easy lookup: district name (uppercase) -> notification object
+    const notificationMap = new Map(notifications.map(n => [n.district.toUpperCase(), n]));
+    console.log(`  Found ${notificationMap.size} notifications with dates.`);
+
+    console.log(`[2] Loading initial page: ${PAGE_URL}`);
     const initial = await fetchFreshPageState();
     console.log(`[2] Found ${initial.posts.length} posts:`, initial.posts.map(p => p.text));
 
@@ -246,11 +268,9 @@ async function main() {
         const { districts } = await getDistrictsForPost(post.value);
         console.log(`  Districts found: ${districts.length}`);
 
-        const oneDistrict = districts//.slice(0, 1);
-        // const secondDistrict = districts.slice(1, 2);
-        // const thirdDistrict = districts.slice(2, 3);
-        // const fourthDistrict = districts.slice(3, 4);
-        for (const district of oneDistrict) {
+        for (const district of districts) {
+            // Find the notification for this district to get the correct dates
+            const districtNotification = notificationMap.get(district.text.toUpperCase());
             let projects = [];
             try {
                 ({ projects } = await getProjectsForDistrict(post.value, district.value));
@@ -310,8 +330,8 @@ async function main() {
                                     post_name: post.text,
                                     vacancy_count: 1,
                                     status: 'open',
-                                    start_date: '2026-08-01',   // set this if the recruitment form/page exposes an application-open date
-                                    end_date: '2026-08-15',     // set this if the recruitment form/page exposes an application-close date
+                                    start_date: formatToISODate(districtNotification?.startDate),
+                                    end_date: formatToISODate(districtNotification?.closingDate),
                                 },
                             ]);
                             vacanciesUpserted++;
