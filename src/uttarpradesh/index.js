@@ -1,4 +1,4 @@
-const { loginWithoutChromium }    = require('./login/awt_login');
+const { loginWithoutChromium } = require('./login/awt_login');
 const { fetchProjectsForDistrict } = require('./up_project');
 const { getGramPanchayats, getAnganwadis } = require('./lib/scraper');
 const { setupAnganwadiCentersTable, upsertCenter } = require('../db-configs/anganwadi_centers');
@@ -6,14 +6,24 @@ const upSessions = require('./up_sessions');
 
 const MAX_LOGIN_RETRIES = 3;
 
-/** Returns only sessions whose end_date is today or in the future */
+// Set to true to filter sessions starting strictly today
+const ONLY_TODAY_START = true;
+
+/** Returns sessions matching active date criteria */
 function getActiveSessions() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return upSessions.filter(s => {
+        const start = new Date(s.start_date);
+        start.setHours(0, 0, 0, 0);
         const end = new Date(s.end_date);
         end.setHours(0, 0, 0, 0);
-        return end >= today;
+
+        if (ONLY_TODAY_START) {
+            return start.getTime() === today.getTime();
+        }
+
+        return start <= today && end >= today;
     });
 }
 
@@ -38,7 +48,7 @@ async function processDistrict(httpClient, session) {
     }
 
     session.cfClearanceToken = loginResult.cfClearanceToken || '';
-    session.sessionId        = loginResult.sessionId        || '';
+    session.sessionId = loginResult.sessionId || '';
     console.log(`  ✅ Logged in — session: ${session.sessionId}`);
 
     // --- Projects ---
@@ -83,12 +93,12 @@ async function processDistrict(httpClient, session) {
 
             for (const awc of awcs) {
                 const record = {
-                    state_name:    'Uttar Pradesh',
+                    state_name: 'Uttar Pradesh',
                     district_name: session.districtName,
-                    project_name:  project.name,
-                    sector_name:   '',
-                    gp:            gp.text,
-                    awc_name:      awc.text,
+                    project_name: project.name,
+                    sector_name: '',
+                    gp: gp.text,
+                    awc_name: awc.text,
                 };
                 try {
                     const id = await upsertCenter(record);
@@ -118,7 +128,7 @@ async function refreshSessions() {
     if (!activeSessions.length) return;
 
     let success = 0;
-    let failed  = 0;
+    let failed = 0;
 
     for (let i = 0; i < activeSessions.length; i++) {
         const session = activeSessions[i];

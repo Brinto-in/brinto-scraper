@@ -45,7 +45,7 @@ async function upsertCenter(center) {
         gp: center.gp ?? '',
         awc_name: center.awc_name ?? null,
     };
-
+    // console.log(payload);
     const columns = Object.keys(payload);
     const placeholders = columns.map(() => '?').join(', ');
 

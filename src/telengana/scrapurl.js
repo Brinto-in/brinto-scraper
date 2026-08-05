@@ -320,6 +320,8 @@ async function main() {
                             if (!centerId) {
                                 throw new Error('upsertCenter returned no id');
                             }
+                            console.log('Upserted center:', centerId);
+
                             centersUpserted++;
 
                             // 2. Upsert the vacancy row for this post at that center
