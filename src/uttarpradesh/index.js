@@ -1,6 +1,7 @@
 const { loginWithoutChromium }    = require('./login/awt_login');
 const { fetchProjectsForDistrict } = require('./up_project');
 const { getGramPanchayats, getAnganwadis } = require('./lib/scraper');
+const { setupAnganwadiCentersTable, upsertCenter } = require('../db-configs/anganwadi_centers');
 const upSessions = require('./up_sessions');
 
 const MAX_LOGIN_RETRIES = 3;
@@ -80,10 +81,22 @@ async function processDistrict(httpClient, session) {
                 continue;
             }
 
-            console.log(`       🏠 ${gp.text} (${awcs.length} AWCs):`);
-            awcs.forEach((awc, i) =>
-                console.log(`         ${i + 1}. ${awc.text} (ID: ${awc.value}, UR: ${awc.UR})`)
-            );
+            for (const awc of awcs) {
+                const record = {
+                    state_name:    'Uttar Pradesh',
+                    district_name: session.districtName,
+                    project_name:  project.name,
+                    sector_name:   '',
+                    gp:            gp.text,
+                    awc_name:      awc.text,
+                };
+                try {
+                    const id = await upsertCenter(record);
+                    console.log(`       [DB ID: ${id}] ${JSON.stringify(record)}`);
+                } catch (dbErr) {
+                    console.error(`       ❌ DB Error inserting [${awc.text}]: ${dbErr.message}`);
+                }
+            }
         }
     }
 }
@@ -94,6 +107,8 @@ async function processDistrict(httpClient, session) {
  */
 async function refreshSessions() {
     const { gotScraping } = await import('got-scraping');
+
+    await setupAnganwadiCentersTable();
 
     const activeSessions = getActiveSessions();
     const today = new Date().toISOString().split('T')[0];
