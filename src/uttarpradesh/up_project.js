@@ -111,7 +111,11 @@ async function main() {
     console.log(`\n✅ All districts processed. Combined data saved to: ${OUTPUT_FILE}`);
 }
 
-main().catch(err => {
-    console.error('A fatal error occurred:', err);
-    process.exit(1);
-});
+module.exports = { fetchProjectsForDistrict };
+
+if (require.main === module) {
+    main().catch(err => {
+        console.error('A fatal error occurred:', err);
+        process.exit(1);
+    });
+}

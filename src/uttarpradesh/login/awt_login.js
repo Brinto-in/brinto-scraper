@@ -5,9 +5,7 @@ const { solveCaptcha } = require('./img_to_number');
 
 // Local array of credentials to log in and collect sessions
 const accounts = [
-    { districtName: 'Ambedkarnagar', mobile: '5555566680', password: 'Test@1234' },
-    { districtName: 'AYODHYA', mobile: '5555566661', password: 'Test@1234' },
-    { districtName: 'Barabanki', mobile: '5555566662', password: 'Test@1234' }
+    { districtName: 'Ambedkarnagar', mobile: '5555566678', password: 'Test@1234' },
 ];
 
 /**
