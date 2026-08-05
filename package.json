@@ -22,6 +22,7 @@
     "pdf-parse": "^2.4.5",
     "playwright": "^1.62.1",
     "pm2": "^7.0.3",
+    "tesseract.js": "^7.0.0",
     "tough-cookie": "^6.0.2"
   }
 }

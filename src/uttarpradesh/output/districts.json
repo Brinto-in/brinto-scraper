@@ -1,92 +1,66 @@
 [
   {
     "value": "3",
-    "name": "Ambedkarnagar",
-    "status": "active"
+    "name": "Ambedkarnagar"
   },
   {
     "value": "7",
-    "name": "Ayodhya",
-    "status": "active"
-  },
-  {
-    "value": "14",
-    "name": "Barabanki",
-    "status": "active"
+    "name": "Ayodhya"
   },
   {
     "value": "16",
-    "name": "Basti",
-    "status": "active"
+    "name": "Basti"
   },
   {
     "value": "20",
-    "name": "Bulandshahr",
-    "status": "active"
+    "name": "Bulandshahr"
   },
   {
     "value": "24",
-    "name": "Etah",
-    "status": "active"
+    "name": "Etah"
   },
   {
     "value": "28",
-    "name": "Firozabad",
-    "status": "active"
+    "name": "Firozabad"
   },
   {
     "value": "30",
-    "name": "Ghaziabad",
-    "status": "active"
+    "name": "Ghaziabad"
   },
   {
     "value": "35",
-    "name": "Hapur",
-    "status": "active"
+    "name": "Hapur"
   },
   {
     "value": "47",
-    "name": "Kushinagar",
-    "status": "active"
+    "name": "Kushinagar"
   },
   {
     "value": "46",
-    "name": "Lakhimpur Kheri",
-    "status": "active"
+    "name": "Lakhimpur Kheri"
   },
   {
     "value": "62",
-    "name": "Raebareli",
-    "status": "active"
+    "name": "Raebareli"
   },
   {
     "value": "64",
-    "name": "Saharanpur",
-    "status": "active"
+    "name": "Saharanpur"
   },
   {
     "value": "66",
-    "name": "Sant Kabir Nagar",
-    "status": "active"
+    "name": "Sant Kabir Nagar"
   },
   {
     "value": "70",
-    "name": "Siddharthnagar",
-    "status": "active"
+    "name": "Siddharthnagar"
   },
   {
     "value": "71",
-    "name": "Sitapur",
-    "status": "active"
-  },
-  {
-    "value": "73",
-    "name": "Sultanpur",
-    "status": "active"
+    "name": "Sitapur"
   },
   {
     "value": "74",
-    "name": "Unnao",
-    "status": "active"
+    "name": "Unnao"
   }
 ]
