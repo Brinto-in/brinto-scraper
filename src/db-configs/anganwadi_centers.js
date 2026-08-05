@@ -21,7 +21,7 @@ async function setupAnganwadiCentersTable() {
     // Drop legacy index if it was created on the old column set
     try {
         await db.execute(`DROP INDEX IF EXISTS idx_unique_awc;`);
-    } catch (_) {}
+    } catch (_) { }
 
     await db.execute(`
         CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_awc
@@ -38,12 +38,12 @@ async function setupAnganwadiCentersTable() {
  */
 async function upsertCenter(center) {
     const payload = {
-        state_name:    center.state_name    ?? null,
+        state_name: center.state_name ?? null,
         district_name: center.district_name ?? null,
-        project_name:  center.project_name  ?? null,
-        sector_name:   center.sector_name   ?? '',
-        gp:            center.gp            ?? '',
-        awc_name:      center.awc_name      ?? null,
+        project_name: center.project_name ?? null,
+        sector_name: center.sector_name ?? '',
+        gp: center.gp ?? '',
+        awc_name: center.awc_name ?? null,
     };
 
     const columns = Object.keys(payload);
