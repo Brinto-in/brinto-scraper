@@ -1,5 +1,5 @@
 
-const { BASE_URL, MAX_RETRIES, RETRY_BACKOFF_MS } = require('./config');
+const { AJAX_URLS, MAX_RETRIES, RETRY_BACKOFF_MS } = require('./config');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -16,16 +16,20 @@ function looksLikeChallenge(body) {
  * POSTs form-encoded data to the ajax endpoint, retrying on network errors
  * or Cloudflare challenge pages with exponential backoff.
  * @param {Object} form - key/value pairs to send as x-www-form-urlencoded body
+ * @param {string} [postCode='AWW'] - The post code ('AWW' or 'AWH') to determine the AJAX endpoint.
  * @returns {Promise<string>} raw HTML/text response body
  */
-async function postForm(form) {
+async function postForm(form, postCode = 'AWW') {
   const { gotScraping } = await import('got-scraping');
   let lastError;
+
+  const baseUrl = AJAX_URLS[postCode];
+  if (!baseUrl) throw new Error(`Invalid postCode "${postCode}" provided to postForm.`);
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await gotScraping({
-        url: BASE_URL,
+        url: baseUrl,
         method: 'POST',
         headerGeneratorOptions: {
           browsers: ['chrome'],

@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "start_odisha": "node src/odisha/scraper.js",
-    "start_up": "node src/anganwadi-up/scrapeAll.js",
+    "start_up": "node src/uttarpradesh/index.js",
     "start_telengana": "node src/telengana/scrapurl.js",
     "start:heartbeat": "pm2 start src/index.js --name \"heartbeat-logger\""
   },

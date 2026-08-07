@@ -1,5 +1,9 @@
 module.exports = {
-  BASE_URL: 'https://upanganwadibharti.in/workernew/ajax.php',
+  // AJAX endpoints for the different portals
+  AJAX_URLS: {
+    AWW: 'https://upanganwadibharti.in/workernew/ajax.php', // Anganwadi Worker
+    AWH: 'https://upanganwadibharti.in/helper-v2/ajax.php',   // Anganwadi Helper
+  },
   PAGE_URL: 'https://upanganwadibharti.in/workernew/users/step-1.php',
 
   // Delay (ms) between consecutive requests, to avoid hammering the server
