@@ -2,6 +2,7 @@ const { loginWithoutChromium } = require('./login/awt_login');
 const { fetchProjectsForDistrict } = require('./up_project');
 const { getGramPanchayats, getAnganwadis } = require('./lib/scraper');
 const { setupAnganwadiCentersTable, upsertCenter } = require('../db-configs/anganwadi_centers');
+const { setupAnganwadiVacanciesTable, upsertVacancies } = require('../db-configs/anganwadi_vacancies');
 const upSessions = require('./up_sessions');
 
 const MAX_LOGIN_RETRIES = 3;
@@ -103,6 +104,16 @@ async function processDistrict(httpClient, session) {
                 try {
                     const id = await upsertCenter(record);
                     console.log(`       [DB ID: ${id}] ${JSON.stringify(record)}`);
+                    await upsertVacancies([{
+                        center_id: id,
+                        post_code: 'AWW',
+                        post_name: 'Anganwadi Teacher',
+                        vacancy_count: 1,
+                        start_date: session.start_date,
+                        end_date: session.end_date,
+                    }]);
+                    console.log(`          💼 Vacancy upserted [AWW] center_id=${id} (${session.start_date} → ${session.end_date})`);
+
                 } catch (dbErr) {
                     console.error(`       ❌ DB Error inserting [${awc.text}]: ${dbErr.message}`);
                 }
@@ -119,6 +130,7 @@ async function refreshSessions() {
     const { gotScraping } = await import('got-scraping');
 
     await setupAnganwadiCentersTable();
+    await setupAnganwadiVacanciesTable();
 
     const activeSessions = getActiveSessions();
     const today = new Date().toISOString().split('T')[0];
