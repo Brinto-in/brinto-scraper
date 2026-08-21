@@ -1,5 +1,5 @@
 const cheerio = require('cheerio');
-const { solveCaptcha } = require('./img_to_number');
+const { solveCaptcha } = require('../login/img_to_number');
 
 const LOGIN_URL = 'https://upanganwadibharti.in/helper-v2/users/login.php';
 const CAPTCHA_URL = 'https://upanganwadibharti.in/helper-v2/captcha.php';
