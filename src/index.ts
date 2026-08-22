@@ -1,5 +1,7 @@
 // import { createAnganwadiDistrictsTable } from './database/migrations/001_create_anganwadi_districts.js';
+// import { createAnganwadiCentersTable } from './database/tables/anganwadi-centers.table.js';
 // await createAnganwadiDistrictsTable();
+// await createAnganwadiCentersTable();
 import './anganwadi/up/index.js';
 console.log('=================================');
 console.log('BRINTO SCRAPER');

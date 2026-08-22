@@ -3,9 +3,9 @@ import * as cheerio from 'cheerio';
 import fs from 'fs';
 import readline from 'readline';
 
-import type { PendingAnganwadiDistrict } from '../../database/repositories/anganwadi-district.repository.js';
-import { updateDistrictLogin } from '../../database/repositories/anganwadi-district.repository.js';
-import { solveImage } from '../../libs/img_to_numbers.js';
+import type { PendingAnganwadiDistrict } from '../../../database/repositories/anganwadi-district.repository.js';
+import { updateDistrictLogin } from '../../../database/repositories/anganwadi-district.repository.js';
+import { solveImage } from '../../../libs/img_to_numbers.js';
 
 const rl = readline.createInterface({
     input: process.stdin,

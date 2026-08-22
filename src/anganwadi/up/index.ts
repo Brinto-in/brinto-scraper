@@ -5,10 +5,10 @@ import {
 } from '../../database/repositories/anganwadi-district.repository.js';
 
 import { scrapeAnganwadiDistricts } from './district_scraper.js';
-import { loginAnganwadiDistrict } from './up_anganwadi_login.js';
-import { getAnganwadiProjects } from './up_anganwadi_projects.js';
-import { registerAnganwadiDistrict } from './up_anganwadi_registration.js';
-import { fetchProjectsForDistrict } from './up_dist_projects.js';
+import { getAnganwadiProjects } from './components/up_anganwadi_projects.js';
+import { registerAnganwadiDistrict } from './register/up_anganwadi_registration.js';
+import { fetchProjectsForDistrict } from './components/up_dist_projects.js';
+import { loginAnganwadiDistrict } from './login/up_anganwadi_login.js';
 
 const PORTALS = [
     {
@@ -161,97 +161,115 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     let dist_: any = [];
     dist_.push(loginDistricts[0]);
 
-    for (const district of loginDistricts) {
-    try {
-        // ========================================================
-        // LOGIN
-        // ========================================================
+    for (const district of dist_) {
+        try {
+            // ========================================================
+            // LOGIN
+            // ========================================================
 
-        const loginResult = await loginAnganwadiDistrict(
-            district.mobile,
-            district.password,
-            district.loginUrl,
-            district.captchaUrl,
-            district.submitUrl
-        );
+            const loginResult = await loginAnganwadiDistrict(
+                district.mobile,
+                district.password,
+                district.loginUrl,
+                district.captchaUrl,
+                district.submitUrl
+            );
 
-        console.log(loginResult);
+            console.log(loginResult);
 
-        // ========================================================
-        // GET DISTRICT + PROJECTS
-        // ========================================================
+            // ========================================================
+            // GET DISTRICT + PROJECTS
+            // ========================================================
 
-        const result: any = await fetchProjectsForDistrict(
-            gotScraping,
-            {
-                districtName: district.districtName,
-                cfClearanceToken:
-                    loginResult.cfClearanceToken ?? '',
-                sessionId:
-                    loginResult.sessionId ?? '',
-                stepUrl: district.step1Url,
-                postCode:
-                    district.step1Url?.includes('helper')
-                        ? 'AWH'
-                        : 'AWW'
-            }
-        );
+            const result: any = await fetchProjectsForDistrict(
+                gotScraping,
+                {
+                    districtName: district.districtName,
+                    cfClearanceToken:
+                        loginResult.cfClearanceToken ?? '',
+                    sessionId:
+                        loginResult.sessionId ?? '',
+                    stepUrl: district.step1Url,
+                    postCode:
+                        district.step1Url?.includes('helper')
+                            ? 'AWH'
+                            : 'AWW'
+                }
+            );
 
-        console.log(result);
+            console.log(result);
 
-        // ========================================================
-        // AJAX URL
-        // ========================================================
+            // ========================================================
+            // AJAX URL
+            // ========================================================
 
-        const portal =
-            new URL(district.step1Url)
-                .pathname
-                .split('/')[1];
+            const portal =
+                new URL(district.step1Url)
+                    .pathname
+                    .split('/')[1];
 
-        const ajaxUrl =
-            `https://upanganwadibharti.in/${portal}/ajax.php`;
+            const ajaxUrl =
+                `https://upanganwadibharti.in/${portal}/ajax.php`;
 
-        // ========================================================
-        // GET PROJECTS
-        // ========================================================
+            // ========================================================
+            // GET PROJECTS
+            // ========================================================
 
-        for (const project of result.projects ?? []) {
-            try {
-                const projectResult =
-                    await getAnganwadiProjects(
-                        ajaxUrl,
-                        result.district?.value,
-                        project.value
+            for (const project of result.projects ?? []) {
+                try {
+                    const projectResult =
+                        await getAnganwadiProjects(
+                            ajaxUrl,
+                            result.district?.value,
+                            project.value
+                        );
+
+                    console.log(
+                        `District: ${district.districtName}`
                     );
 
-                console.log(
-                    `District: ${district.districtName}`
-                );
+                    console.log(
+                        `Project: ${project.value}`
+                    );
 
-                console.log(
-                    `Project: ${project.value}`
-                );
+                    console.log(projectResult);
+                    // console.log({
+                    //     stateName: 'Uttar Pradesh',
+                    //     districtName: district.districtName,
+                    //     projectName: project.name,
+                    //     sectorName: '',
+                    //     gp: grampanchayatID,
+                    //     awcName: center.name
+                    // });
+                    
 
-                console.log(projectResult);
+                    // await upsertAnganwadiCenter({
+                    //     stateName: 'UP',
+                    //     districtName: district.districtName,
+                    //     projectName: project.name,
+                    //     sectorName: '',
+                    //     gp: grampanchayatID,
+                    //     awcName: center.name
+                    // });
 
-            } catch (error) {
-                console.error(
-                    `Project failed: ${project.value}`,
-                    error instanceof Error
-                        ? error.message
-                        : error
-                );
+                } catch (error) {
+                    console.error(
+                        `Project failed: ${project.value}`,
+                        error instanceof Error
+                            ? error.message
+                            : error
+                    );
+                }
             }
+
+        } catch (error) {
+
+            console.error(
+                `Login/processing failed for ${district.districtName}:`,
+                error instanceof Error
+                    ? error.message
+                    : error
+            );
         }
-
-    } catch (error) {
-
-        console.error(
-            `Login/processing failed for ${district.districtName}:`,
-            error instanceof Error
-                ? error.message
-                : error
-        );
     }
-}
 }
