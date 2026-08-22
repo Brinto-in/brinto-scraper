@@ -1,108 +1,17 @@
 import { gotScraping } from 'got-scraping';
+import { CookieJar } from 'tough-cookie';
 import * as cheerio from 'cheerio';
-import fs from 'fs';
-import readline from 'readline';
+
 
 import type {
     AnganwadiLoginDistrict
 } from '../../database/repositories/anganwadi-district.repository.js';
 import { solveImage } from '../../libs/img_to_numbers.js';
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-function askQuestion(question: string): Promise<string> {
-    return new Promise((resolve) => {
-        rl.question(question, (answer) => {
-            resolve(answer.trim());
-        });
-    });
-}
-
-/**
- * Convert Set-Cookie headers into a normal Cookie header.
- */
-function mergeCookies(
-    existingCookies: string,
-    setCookieHeader: string | string[] | undefined
-): string {
-
-    const cookieMap = new Map<string, string>();
-
-    // Existing cookies
-    if (existingCookies) {
-        existingCookies
-            .split(';')
-            .map((cookie) => cookie.trim())
-            .filter(Boolean)
-            .forEach((cookie) => {
-                const index = cookie.indexOf('=');
-
-                if (index > 0) {
-                    const name = cookie.substring(0, index);
-                    const value = cookie.substring(index + 1);
-
-                    cookieMap.set(name, value);
-                }
-            });
-    }
-
-    // New Set-Cookie headers
-    const cookies = Array.isArray(setCookieHeader)
-        ? setCookieHeader
-        : setCookieHeader
-            ? [setCookieHeader]
-            : [];
-
-    for (const cookie of cookies) {
-
-        const firstPart:any = String(cookie).split(';')[0];
-
-        const index = firstPart.indexOf('=');
-
-        if (index <= 0) {
-            continue;
-        }
-
-        const name = firstPart.substring(0, index);
-        const value = firstPart.substring(index + 1);
-
-        cookieMap.set(name, value);
-    }
-
-    return Array.from(cookieMap.entries())
-        .map(([name, value]) => `${name}=${value}`)
-        .join('; ');
-}
-
-/**
- * Extract PHPSESSID from Cookie header.
- */
-function extractPhpSessId(
-    cookies: string
-): string {
-
-    const match = cookies.match(
-        /(?:^|;\s*)PHPSESSID=([^;]+)/i
-    );
-
-    return match?.[1] ?? '';
-}
-
 export interface AnganwadiLoginResult {
     success: boolean;
-    isLoggedIn: boolean;
-
-    districtId: string;
-    districtName: string;
-
-    phpSessId: string;
-    cookies: string;
-
-    finalUrl: string;
-    statusCode: number;
+    sessionId: string | null;
+    cfClearanceToken: string | null;
 }
 
 export async function loginAnganwadiDistrict(
@@ -118,88 +27,119 @@ export async function loginAnganwadiDistrict(
     console.log(`Mobile   : ${district.mobile}`);
     console.log(`Login URL: ${district.loginUrl}`);
 
+    const cookieJar = new CookieJar();
+
     try {
 
         // ========================================================
-        // STEP 1
-        // Open login.php
+        // STEP 1 - Load login page
         // ========================================================
 
-        console.log('\n[1/4] Opening login page...');
+        console.log('\n[1/4] Loading login page...');
 
         const loginPage = await gotScraping({
             url: district.loginUrl,
-
-            headers: {
-                'Accept-Language':
-                    'en-US,en;q=0.9,hi;q=0.8',
-
-                'User-Agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-                    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-                    'Chrome/124.0.0.0 Safari/537.36'
+            cookieJar,
+            retry: {
+                limit: 0
             },
-
             https: {
                 rejectUnauthorized: false
             },
-
             timeout: {
                 request: 15000
             }
         });
-
-        let cookies = mergeCookies(
-            '',
-            loginPage.headers['set-cookie']
-        );
-
-        console.log(
-            `✓ Login page loaded (${loginPage.statusCode})`
-        );
-
-        console.log(
-            `✓ Cookies: ${cookies || 'none'}`
-        );
-
-        // ========================================================
-        // Parse login form
-        // ========================================================
 
         const $ = cheerio.load(loginPage.body);
 
-        const csrfToken =
+        const token =
             $('input[name="_token"]').attr('value') ?? '';
 
-        if (!csrfToken) {
+        if (!token) {
             throw new Error(
-                'Login _token not found'
+                'CSRF token not found on login page'
             );
         }
 
-        console.log('✓ _token found');
+        console.log('✓ Login page loaded');
+        console.log('✓ CSRF token found');
 
         // ========================================================
-        // STEP 2
-        // Get CAPTCHA using SAME session
+        // STEP 2 - Get CAPTCHA
         // ========================================================
 
-        console.log('\n[2/4] Getting CAPTCHA...');
+        console.log('\n[2/4] Downloading CAPTCHA...');
 
-        const captchaResponse = await gotScraping({
+        const captchaImage = await gotScraping({
             url: district.captchaUrl,
-
+            cookieJar,
             responseType: 'buffer',
-
-            headers: {
-                Cookie: cookies,
-                Referer: district.loginUrl,
-
-                'User-Agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-                    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-                    'Chrome/124.0.0.0 Safari/537.36'
+            retry: {
+                limit: 0
             },
+            headers: {
+                Referer: district.loginUrl
+            },
+            https: {
+                rejectUnauthorized: false
+            },
+            timeout: {
+                request: 15000
+            }
+        });
+
+        console.log('✓ CAPTCHA downloaded');
+
+        // IMPORTANT:
+        // The same cookieJar is used here.
+        // Therefore PHPSESSID remains associated
+        // with this login session.
+
+        console.log('\n[3/4] Solving CAPTCHA...');
+
+        const captchaCode =
+            await solveImage(captchaImage.body);
+
+        console.log(
+            `🔍 Captcha: ${captchaCode}`
+        );
+
+        if (
+            !captchaCode ||
+            captchaCode.length < 4
+        ) {
+            throw new Error(
+                `Invalid captcha: "${captchaCode}"`
+            );
+        }
+
+        // ========================================================
+        // STEP 3 - Submit login
+        // ========================================================
+
+        console.log('\n[4/4] Submitting login...');
+
+        const post = await gotScraping({
+            url: district.submitUrl,
+
+            method: 'POST',
+
+            cookieJar,
+
+            retry: {
+                limit: 0
+            },
+
+            form: {
+                _token: token,
+                user_id: district.mobile,
+                pass: district.password,
+                captcha: captchaCode,
+                login_submit: ''
+            },
+
+            followRedirect: false,
 
             https: {
                 rejectUnauthorized: false
@@ -207,286 +147,119 @@ export async function loginAnganwadiDistrict(
 
             timeout: {
                 request: 15000
+            },
+
+            headers: {
+                Referer: district.loginUrl,
+                Origin: 'https://upanganwadibharti.in'
             }
         });
 
-        // IMPORTANT:
-        // CAPTCHA response can update PHPSESSID.
-        cookies = mergeCookies(
-            cookies,
-            captchaResponse.headers['set-cookie']
-        );
+        const redirect =
+            post.headers.location ?? '';
 
-        const phpSessIdAfterCaptcha =
-            extractPhpSessId(cookies);
-
-        const captchaPath =
-            `login_captcha_${district.id}.png`;
-
-        fs.writeFileSync(
-            captchaPath,
-            captchaResponse.body
+        console.log(
+            `HTTP ${post.statusCode}`
         );
 
         console.log(
-            `✓ CAPTCHA saved: ${captchaPath}`
-        );
-
-        console.log(
-            `✓ PHPSESSID: ${phpSessIdAfterCaptcha || 'NOT FOUND'
-            }`
+            `Redirect: ${redirect || 'none'}`
         );
 
         // ========================================================
-        // STEP 3
-        // CAPTCHA input
+        // LOGIN SUCCESS CHECK
         // ========================================================
 
-        const captcha = await solveImage(captchaPath);
+        if (!redirect.includes('step-1.php')) {
 
-        if (!captcha) {
+            console.log('✗ Login failed');
+
             throw new Error(
-                'CAPTCHA cannot be empty'
+                `Login failed — redirect: ${
+                    redirect || 'none'
+                }`
             );
         }
 
+        console.log('✓ Login successful');
+
         // ========================================================
-        // STEP 4
-        // Submit login
+        // GET COOKIES FROM COOKIE JAR
         // ========================================================
 
-        console.log(
-            '\n[3/4] Submitting login...'
-        );
-
-        const submitResponse =
-            await gotScraping.post(
-                district.loginUrl,
-                {
-                    headers: {
-                        Cookie: cookies,
-
-                        Referer:
-                            district.loginUrl,
-
-                        Origin:
-                            'https://upanganwadibharti.in',
-
-                        'Content-Type':
-                            'application/x-www-form-urlencoded',
-
-                        'User-Agent':
-                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-                            'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-                            'Chrome/124.0.0.0 Safari/537.36'
-                    },
-
-                    form: {
-                        _token: csrfToken,
-
-                        user_id:
-                            district.mobile,
-
-                        pass:
-                            district.password,
-
-                        captcha,
-
-                        login_submit: ''
-                    },
-
-                    https: {
-                        rejectUnauthorized: false
-                    },
-
-                    followRedirect: true,
-
-                    timeout: {
-                        request: 20000
-                    }
-                }
+        const jarCookies =
+            await cookieJar.getCookies(
+                district.loginUrl
             );
 
-        // Merge any cookies returned by login.
-        cookies = mergeCookies(
-            cookies,
-            submitResponse.headers['set-cookie']
+        const cookieMap = Object.fromEntries(
+            jarCookies.map((cookie) => [
+                cookie.key,
+                cookie.value
+            ])
         );
 
-        const phpSessId =
-            extractPhpSessId(cookies);
+        // Also inspect Set-Cookie returned by POST.
+        const setCookies =
+            post.headers['set-cookie'] ?? [];
+
+        for (const setCookie of setCookies) {
+
+            const firstPart: any =
+                String(setCookie).split(';')[0];
+
+            const separator =
+                firstPart.indexOf('=');
+
+            if (separator === -1) {
+                continue;
+            }
+
+            const key =
+                firstPart.substring(0, separator).trim();
+
+            const value =
+                firstPart.substring(separator + 1).trim();
+
+            if (key && value) {
+                cookieMap[key] = value;
+            }
+        }
+
+        const sessionId =
+            cookieMap['PHPSESSID'] ?? null;
+
+        const cfClearanceToken =
+            cookieMap['cf_clearance'] ?? null;
+
+        console.log('\nSession information:');
 
         console.log(
-            `HTTP ${submitResponse.statusCode}`
-        );
-
-        console.log(
-            `Final URL: ${submitResponse.url}`
-        );
-
-        console.log(
-            `PHPSESSID: ${phpSessId || 'NOT FOUND'
+            `PHPSESSID: ${
+                sessionId
+                    ? sessionId
+                    : 'NOT FOUND'
             }`
         );
 
-        // ========================================================
-        // Check response
-        // ========================================================
+        console.log(
+            `cf_clearance: ${
+                cfClearanceToken
+                    ? 'FOUND'
+                    : 'NOT FOUND'
+            }`
+        );
 
-        const body =
-            submitResponse.body ?? '';
-
-        const bodyLower =
-            body.toLowerCase();
-
-        const captchaError =
-            bodyLower.includes(
-                'captcha verification failed'
-            ) ||
-            bodyLower.includes(
-                'invalid captcha'
-            ) ||
-            bodyLower.includes(
-                'कृपया सही कैप्चा दर्ज करें'
+        if (!sessionId) {
+            throw new Error(
+                'Login succeeded but PHPSESSID was not found'
             );
-
-        const invalidCredentials =
-            bodyLower.includes(
-                'invalid user id'
-            ) ||
-            bodyLower.includes(
-                'invalid password'
-            ) ||
-            bodyLower.includes(
-                'user not found'
-            ) ||
-            bodyLower.includes(
-                'गलत यूजर आईडी'
-            ) ||
-            bodyLower.includes(
-                'पासवर्ड गलत है'
-            );
-
-        // The old implementation also used step-1/dashboard/
-        // logout/welcome indicators to determine authentication.
-        const authenticated =
-            submitResponse.url.includes(
-                'step-1'
-            ) ||
-            submitResponse.url.includes(
-                'dashboard'
-            ) ||
-            submitResponse.url.includes(
-                'application'
-            ) ||
-            submitResponse.url.includes(
-                'profile'
-            ) ||
-            bodyLower.includes(
-                'step-1.php'
-            ) ||
-            bodyLower.includes(
-                'logout'
-            ) ||
-            bodyLower.includes(
-                'लॉगआउट'
-            ) ||
-            bodyLower.includes(
-                'welcome'
-            ) ||
-            bodyLower.includes(
-                'स्वागत'
-            );
-
-        if (captchaError) {
-
-            console.log(
-                '✗ CAPTCHA verification failed'
-            );
-
-            return {
-                success: false,
-                isLoggedIn: false,
-
-                districtId:
-                    district.districtId,
-
-                districtName:
-                    district.districtName,
-
-                phpSessId,
-                cookies,
-
-                finalUrl:
-                    submitResponse.url,
-
-                statusCode:
-                    submitResponse.statusCode
-            };
         }
-
-        if (invalidCredentials) {
-
-            console.log(
-                '✗ Invalid user ID/password'
-            );
-
-            return {
-                success: false,
-                isLoggedIn: false,
-
-                districtId:
-                    district.districtId,
-
-                districtName:
-                    district.districtName,
-
-                phpSessId,
-                cookies,
-
-                finalUrl:
-                    submitResponse.url,
-
-                statusCode:
-                    submitResponse.statusCode
-            };
-        }
-
-        console.log(
-            '\n[4/4] Login session established'
-        );
-
-        console.log(
-            `✓ PHPSESSID = ${phpSessId}`
-        );
-
-        console.log(
-            `✓ Authenticated = ${authenticated}`
-        );
 
         return {
-            success:
-                submitResponse.statusCode >= 200 &&
-                submitResponse.statusCode < 400 &&
-                !captchaError,
-
-            isLoggedIn:
-                authenticated,
-
-            districtId:
-                district.districtId,
-
-            districtName:
-                district.districtName,
-
-            phpSessId,
-            cookies,
-
-            finalUrl:
-                submitResponse.url,
-
-            statusCode:
-                submitResponse.statusCode
+            success: true,
+            sessionId,
+            cfClearanceToken
         };
 
     } catch (error) {
@@ -500,21 +273,8 @@ export async function loginAnganwadiDistrict(
 
         return {
             success: false,
-            isLoggedIn: false,
-
-            districtId:
-                district.districtId,
-
-            districtName:
-                district.districtName,
-
-            phpSessId: '',
-            cookies: '',
-
-            finalUrl:
-                district.loginUrl,
-
-            statusCode: 0
+            sessionId: null,
+            cfClearanceToken: null
         };
     }
 }

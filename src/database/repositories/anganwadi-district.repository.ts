@@ -166,7 +166,7 @@ export async function getLoginDistricts(): Promise<
     loginUrl: String(row.login_url),
     step1Url: String(row.step_1_url),
     captchaUrl: String(row.captcha_url),
-    submitUrl: String(row.captcha_url),
+    submitUrl: String(row.submit_url),
 
     mobile: String(row.mobile),
     password: String(row.password)
