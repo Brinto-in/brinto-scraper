@@ -6,6 +6,7 @@ import {
 
 import { scrapeAnganwadiDistricts } from './district_scraper.js';
 import { loginAnganwadiDistrict } from './up_anganwadi_login.js';
+import { getAnganwadiProjects } from './up_anganwadi_projects.js';
 import { registerAnganwadiDistrict } from './up_anganwadi_registration.js';
 import { fetchProjectsForDistrict } from './up_dist_projects.js';
 
@@ -161,22 +162,96 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     dist_.push(loginDistricts[0]);
 
     for (const district of loginDistricts) {
+    try {
+        // ========================================================
+        // LOGIN
+        // ========================================================
 
-        try {
+        const loginResult = await loginAnganwadiDistrict(
+            district.mobile,
+            district.password,
+            district.loginUrl,
+            district.captchaUrl,
+            district.submitUrl
+        );
 
-            const login_result = await loginAnganwadiDistrict(district.mobile, district.password, district.loginUrl, district.captchaUrl, district.submitUrl);
-            console.log(login_result);
-            const result_ = await fetchProjectsForDistrict(gotScraping, { districtName: district.districtName, cfClearanceToken: login_result.cfClearanceToken??'', sessionId: login_result.sessionId??'', stepUrl: district.step1Url, postCode: district.step1Url?.includes('helper') ? 'AWH' : 'AWW'});
-            console.log(result_);
-            
-        } catch (error) {
+        console.log(loginResult);
 
-            console.error(
-                `Login failed for ${district.districtName}:`,
-                error instanceof Error
-                    ? error.message
-                    : error
-            );
+        // ========================================================
+        // GET DISTRICT + PROJECTS
+        // ========================================================
+
+        const result: any = await fetchProjectsForDistrict(
+            gotScraping,
+            {
+                districtName: district.districtName,
+                cfClearanceToken:
+                    loginResult.cfClearanceToken ?? '',
+                sessionId:
+                    loginResult.sessionId ?? '',
+                stepUrl: district.step1Url,
+                postCode:
+                    district.step1Url?.includes('helper')
+                        ? 'AWH'
+                        : 'AWW'
+            }
+        );
+
+        console.log(result);
+
+        // ========================================================
+        // AJAX URL
+        // ========================================================
+
+        const portal =
+            new URL(district.step1Url)
+                .pathname
+                .split('/')[1];
+
+        const ajaxUrl =
+            `https://upanganwadibharti.in/${portal}/ajax.php`;
+
+        // ========================================================
+        // GET PROJECTS
+        // ========================================================
+
+        for (const project of result.projects ?? []) {
+            try {
+                const projectResult =
+                    await getAnganwadiProjects(
+                        ajaxUrl,
+                        result.district?.value,
+                        project.value
+                    );
+
+                console.log(
+                    `District: ${district.districtName}`
+                );
+
+                console.log(
+                    `Project: ${project.value}`
+                );
+
+                console.log(projectResult);
+
+            } catch (error) {
+                console.error(
+                    `Project failed: ${project.value}`,
+                    error instanceof Error
+                        ? error.message
+                        : error
+                );
+            }
         }
+
+    } catch (error) {
+
+        console.error(
+            `Login/processing failed for ${district.districtName}:`,
+            error instanceof Error
+                ? error.message
+                : error
+        );
     }
+}
 }
