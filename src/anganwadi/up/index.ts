@@ -164,7 +164,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     dist_.push(loginDistricts[0]);
 
     // Cache static dynamic URLs or utilities outside the loop if possible
-    for (const district of loginDistricts) {
+    for (const district of dist_) {
         try {
             // 1. Authenticate District
             const loginResult = await loginAnganwadiDistrict(
@@ -249,4 +249,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
             );
         }
     }
+    console.log('\n==============================================');
+    console.log('UP ANGANWADI PROCESS COMPLETED');
+    console.log('==============================================');
 }

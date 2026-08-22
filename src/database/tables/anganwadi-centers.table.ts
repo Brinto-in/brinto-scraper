@@ -11,19 +11,16 @@ export async function createAnganwadiCentersTable(): Promise<void> {
             gp TEXT NOT NULL DEFAULT '',
             awc_name TEXT NOT NULL,
             createdAt TEXT DEFAULT (datetime('now')),
-            updatedAt TEXT DEFAULT (datetime('now'))
-        )
-    `);
+            updatedAt TEXT DEFAULT (datetime('now')),
 
-    await db.execute(`
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_awc
-        ON anganwadi_centers (
-            state_name,
-            district_name,
-            project_name,
-            sector_name,
-            gp,
-            awc_name
+            UNIQUE (
+                state_name,
+                district_name,
+                project_name,
+                sector_name,
+                gp,
+                awc_name
+            )
         )
     `);
 
