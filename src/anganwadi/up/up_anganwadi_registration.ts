@@ -199,25 +199,25 @@ export async function registerAnganwadiDistrict(
         // STEP 5: Check response
         // ========================================================
 
-        const responseBody = postRes.body.toLowerCase();
+        // const responseBody = postRes.body.toLowerCase();
 
-        const registrationFailed =
-            responseBody.includes('invalid captcha') ||
-            responseBody.includes('captcha incorrect') ||
-            responseBody.includes('already registered') ||
-            responseBody.includes('error');
+        // const registrationFailed =
+        //     responseBody.includes('invalid captcha') ||
+        //     responseBody.includes('captcha incorrect') ||
+        //     responseBody.includes('already registered') ||
+        //     responseBody.includes('error');
 
-        if (registrationFailed) {
-            console.log(
-                '✗ Registration was not successful'
-            );
+        // if (registrationFailed) {
+        //     console.log(
+        //         '✗ Registration was not successful'
+        //     );
 
-            console.log(
-                postRes.body.slice(0, 1000)
-            );
+        //     console.log(
+        //         postRes.body.slice(0, 1000)
+        //     );
 
-            return;
-        }
+        //     return;
+        // }
 
         // ========================================================
         // STEP 6: Save credentials
