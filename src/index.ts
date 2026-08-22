@@ -3,7 +3,7 @@ import { createAnganwadiCentersTable } from './database/tables/anganwadi-centers
 import { createAnganwadiVacanciesTable } from './database/tables/anganwadi-vacancies.table.js';
 // await createAnganwadiDistrictsTable();
 // await createAnganwadiCentersTable();
-await createAnganwadiVacanciesTable();
+// await createAnganwadiVacanciesTable();
 import './anganwadi/up/index.js';
 console.log('=================================');
 console.log('BRINTO SCRAPER');

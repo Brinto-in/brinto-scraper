@@ -158,6 +158,8 @@ export async function runUpAnganwadiScraper(): Promise<void> {
 
     const loginDistricts = await getLoginDistricts();
 
+    console.log(loginDistricts);
+    
     console.log(
         `Found ${loginDistricts.length} districts with credentials`
     );
@@ -165,7 +167,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     dist_.push(loginDistricts[0]);
 
     // Cache static dynamic URLs or utilities outside the loop if possible
-    for (const district of dist_) {
+    for (const district of loginDistricts) {
         try {
             // 1. Authenticate District
             const loginResult = await loginAnganwadiDistrict(
@@ -231,8 +233,8 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                                                 postName: postCode === 'AWH' ? 'Helper' : 'Worker',
                                                 vacancyCount: 1,
                                                 status: 'open',
-                                                startDate: '2026-09-01',
-                                                endDate: '2026-09-01'
+                                                startDate: district.start_date,
+                                                endDate: district.end_date
                                             });
                                         })
                                     );

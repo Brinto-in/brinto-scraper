@@ -132,6 +132,9 @@ export interface AnganwadiLoginDistrict {
 
   mobile: string;
   password: string;
+
+  start_date: string | null;
+  end_date: string | null;
 }
 
 export async function getLoginDistricts(): Promise<
@@ -148,12 +151,18 @@ export async function getLoginDistricts(): Promise<
             captcha_url,
             submit_url,
             mobile,
-            password
+            password,
+            start_date,
+            end_date
         FROM anganwadi_districts
         WHERE mobile IS NOT NULL
           AND password IS NOT NULL
           AND mobile != ''
           AND password != ''
+          AND (
+              end_date IS NULL
+              OR date(end_date) >= date('now')
+          )
         ORDER BY id
     `);
 
@@ -169,6 +178,16 @@ export async function getLoginDistricts(): Promise<
     submitUrl: String(row.submit_url),
 
     mobile: String(row.mobile),
-    password: String(row.password)
+    password: String(row.password),
+
+    start_date:
+      row.start_date !== null && row.start_date !== undefined
+        ? String(row.start_date)
+        : null,
+
+    end_date:
+      row.end_date !== null && row.end_date !== undefined
+        ? String(row.end_date)
+        : null
   }));
 }

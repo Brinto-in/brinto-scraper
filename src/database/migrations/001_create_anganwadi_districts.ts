@@ -18,10 +18,17 @@ export async function createAnganwadiDistrictsTable(): Promise<void> {
             mobile TEXT,
             password TEXT,
 
+            start_date TEXT,
+            end_date TEXT,
+
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-            UNIQUE(state, district_id, source_url)
+            UNIQUE (
+                state,
+                district_id,
+                source_url
+            )
         )
     `);
 
