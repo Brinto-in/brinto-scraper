@@ -7,6 +7,7 @@ import {
 import { scrapeAnganwadiDistricts } from './district_scraper.js';
 import { loginAnganwadiDistrict } from './up_anganwadi_login.js';
 import { registerAnganwadiDistrict } from './up_anganwadi_registration.js';
+import { fetchProjectsForDistrict } from './up_dist_projects.js';
 
 const PORTALS = [
     {
@@ -60,6 +61,7 @@ const PORTALS = [
 ];
 
 export async function runUpAnganwadiScraper(): Promise<void> {
+    const { gotScraping } = await import('got-scraping');
 
     // ============================================================
     // STEP 1: SCRAPE DISTRICTS
@@ -164,6 +166,8 @@ export async function runUpAnganwadiScraper(): Promise<void> {
 
             const login_result = await loginAnganwadiDistrict(district.mobile, district.password, district.loginUrl, district.captchaUrl, district.submitUrl);
             console.log(login_result);
+            const result_ = await fetchProjectsForDistrict(gotScraping, { districtName: district.districtName, cfClearanceToken: login_result.cfClearanceToken??'', sessionId: login_result.sessionId??'', stepUrl: district.step1Url, postCode: district.step1Url?.includes('helper') ? 'AWH' : 'AWW'});
+            console.log(result_);
             
         } catch (error) {
 
