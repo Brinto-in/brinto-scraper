@@ -1,4 +1,7 @@
 import { scrapeTelanganaDistricts } from './district_scraper.js';
+import {
+    upsertTelanganaDistrict
+} from '../../database/repositories/anganwadi-district.repository.js';
 
 export async function runTelanganaAnganwadi(): Promise<void> {
 
@@ -8,7 +11,29 @@ export async function runTelanganaAnganwadi(): Promise<void> {
 
     const districts = await scrapeTelanganaDistricts();
 
-    console.log('\nTelangana Districts:');
-}
+    for (const district of districts) {
+        try {
 
-// runTelanganaAnganwadi();
+            await upsertTelanganaDistrict(district);
+
+            console.log(
+                `✓ Saved: ${district.districtName} | ` +
+                `${district.startDate ?? 'N/A'} - ` +
+                `${district.endDate ?? 'N/A'}`
+            );
+
+        } catch (error) {
+
+            console.error(
+                `Failed to save ${district.districtName}:`,
+                error instanceof Error
+                    ? error.message
+                    : error
+            );
+        }
+    }
+
+    console.log(
+        `✓ Telangana districts processed: ${districts.length}`
+    );
+}

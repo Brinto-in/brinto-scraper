@@ -191,3 +191,58 @@ export async function getLoginDistricts(): Promise<
         : null
   }));
 }
+export interface TelanganaDistrict {
+  stateName: string;
+  districtName: string;
+  startDate: string | null;
+  endDate: string | null;
+}
+
+export async function upsertTelanganaDistrict(
+  district: TelanganaDistrict
+): Promise<void> {
+
+  await db.execute({
+    sql: `
+            INSERT INTO anganwadi_districts (
+                state,
+                district_id,
+                district_name,
+                source_url,
+                login_url,
+                captcha_url,
+                submit_url,
+                step_1_url,
+                start_date,
+                end_date
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+            ON CONFLICT(state, district_id, source_url)
+            DO UPDATE SET
+                district_name = excluded.district_name,
+                start_date = excluded.start_date,
+                end_date = excluded.end_date,
+                updated_at = CURRENT_TIMESTAMP
+        `,
+    args: [
+      district.stateName,
+
+      // Telangana source currently doesn't provide a district ID.
+      // We can temporarily use district name as the unique identifier.
+      district.districtName,
+
+      district.districtName,
+
+      'https://mis.tgwdcw.in/',
+
+      '',
+      '',
+      '',
+      '',
+
+      district.startDate,
+      district.endDate
+    ]
+  });
+}
