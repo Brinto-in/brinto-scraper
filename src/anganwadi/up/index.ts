@@ -9,6 +9,8 @@ import { getGpWardProjects } from './components/up_gp_ward_projects.js';
 import { registerAnganwadiDistrict } from './register/up_anganwadi_registration.js';
 import { fetchProjectsForDistrict } from './components/up_dist_projects.js';
 import { loginAnganwadiDistrict } from './login/up_anganwadi_login.js';
+import { getAnganwadis } from './components/anganwadi_gp_projects.js';
+import { upsertAnganwadiCenter } from '../../database/repositories/anganwadi-center.repository.js';
 
 const PORTALS = [
     {
@@ -161,12 +163,10 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     let dist_: any = [];
     dist_.push(loginDistricts[0]);
 
-    for (const district of dist_) {
+    // Cache static dynamic URLs or utilities outside the loop if possible
+    for (const district of loginDistricts) {
         try {
-            // ========================================================
-            // LOGIN
-            // ========================================================
-
+            // 1. Authenticate District
             const loginResult = await loginAnganwadiDistrict(
                 district.mobile,
                 district.password,
@@ -175,100 +175,77 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                 district.submitUrl
             );
 
-            console.log(loginResult);
+            // 2. Extract portal name and construct AJAX URL once per district
+            const portal = new URL(district.step1Url).pathname.split('/')[1];
+            const ajaxUrl = `https://upanganwadibharti.in/${portal}/ajax.php`;
+            const postCode = district.step1Url?.includes('helper') ? 'AWH' : 'AWW';
 
-            // ========================================================
-            // GET DISTRICT + PROJECTS
-            // ========================================================
+            // 3. Fetch Projects
+            const result: any = await fetchProjectsForDistrict(gotScraping, {
+                districtName: district.districtName,
+                cfClearanceToken: loginResult.cfClearanceToken ?? '',
+                sessionId: loginResult.sessionId ?? '',
+                stepUrl: district.step1Url,
+                postCode
+            });
 
-            const result: any = await fetchProjectsForDistrict(
-                gotScraping,
-                {
-                    districtName: district.districtName,
-                    cfClearanceToken:
-                        loginResult.cfClearanceToken ?? '',
-                    sessionId:
-                        loginResult.sessionId ?? '',
-                    stepUrl: district.step1Url,
-                    postCode:
-                        district.step1Url?.includes('helper')
-                            ? 'AWH'
-                            : 'AWW'
-                }
-            );
+            const districtVal = result.district?.value;
+            const projects = result.projects ?? [];
 
-            console.log(result);
-
-            // ========================================================
-            // AJAX URL
-            // ========================================================
-
-            const portal =
-                new URL(district.step1Url)
-                    .pathname
-                    .split('/')[1];
-
-            const ajaxUrl =
-                `https://upanganwadibharti.in/${portal}/ajax.php`;
-
-            // ========================================================
-            // GET PROJECTS
-            // ========================================================
-
-            for (const project of result.projects ?? []) {
-                try {
-                    const gp_wards =
-                        await getGpWardProjects(
+            // 4. Process Projects Concurrently or Sequentially
+            await Promise.allSettled(
+                projects.map(async (project: any) => {
+                    try {
+                        const gpWards = await getGpWardProjects(
                             ajaxUrl,
-                            result.district?.value,
+                            districtVal,
                             project.value
                         );
 
-                    console.log(
-                        `District: ${district.districtName}`
-                    );
+                        // Fetch all Anganwadis in parallel for the current project's GP/Wards
+                        await Promise.allSettled(
+                            (gpWards ?? []).map(async (gpWard: any) => {
+                                try {
+                                    const anganwadis: any[] = await getAnganwadis(
+                                        ajaxUrl,
+                                        gpWard.name,
+                                        project.value,
+                                        districtVal
+                                    );
 
-                    console.log(
-                        `Project: ${project.value}`
-                    );
-
-                    console.log(gp_wards);
-                    // console.log({
-                    //     stateName: 'Uttar Pradesh',
-                    //     districtName: district.districtName,
-                    //     projectName: project.name,
-                    //     sectorName: '',
-                    //     gp: grampanchayatID,
-                    //     awcName: center.name
-                    // });
-                    
-
-                    // await upsertAnganwadiCenter({
-                    //     stateName: 'UP',
-                    //     districtName: district.districtName,
-                    //     projectName: project.name,
-                    //     sectorName: '',
-                    //     gp: grampanchayatID,
-                    //     awcName: center.name
-                    // });
-
-                } catch (error) {
-                    console.error(
-                        `Project failed: ${project.value}`,
-                        error instanceof Error
-                            ? error.message
-                            : error
-                    );
-                }
-            }
-
+                                    // Map each Anganwadi to an async upsert task and await all of them concurrently
+                                    await Promise.all(
+                                        (anganwadis ?? []).map(async (awc: any) => {
+                                            await upsertAnganwadiCenter({
+                                                stateName: 'Uttar Pradesh',
+                                                districtName: district.districtName,
+                                                projectName: project.name,
+                                                sectorName: '',
+                                                gp: gpWard.name,
+                                                awcName: awc.name
+                                            });
+                                        })
+                                    );
+                                } catch (error) {
+                                    console.error(
+                                        `Failed Anganwadi (District: ${district.districtName}, GP/Ward: ${gpWard.name}):`,
+                                        error instanceof Error ? error.message : error
+                                    );
+                                }
+                            })
+                        );
+                    } catch (error) {
+                        console.error(
+                            `Failed Project (District: ${district.districtName}, Project: ${project.value}):`,
+                            error instanceof Error ? error.message : error
+                        );
+                    }
+                })
+            );
         } catch (error) {
-
             console.error(
-                `Login/processing failed for ${district.districtName}:`,
-                error instanceof Error
-                    ? error.message
-                    : error
+                `Failed District (${district.districtName}):`,
+                error instanceof Error ? error.message : error
             );
         }
     }

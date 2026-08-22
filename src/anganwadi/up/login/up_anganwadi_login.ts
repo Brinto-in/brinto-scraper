@@ -1,7 +1,7 @@
 import { gotScraping } from 'got-scraping';
 import { CookieJar } from 'tough-cookie';
 import * as cheerio from 'cheerio';
-import { solveImage } from '../../libs/img_to_numbers.js';
+import { solveImage } from '../../../libs/img_to_numbers.js';
 
 
 export interface AnganwadiLoginResult {
