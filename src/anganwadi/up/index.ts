@@ -10,27 +10,51 @@ const PORTALS = [
     {
         registrationUrl:
             'https://upanganwadibharti.in/worker-v4/users/registration.php',
+
+        loginUrl:
+            'https://upanganwadibharti.in/worker-v4/users/login.php',
+
+        step1Url:
+            'https://upanganwadibharti.in/worker-v4/users/step-1.php',
+
         captchaUrl:
             'https://upanganwadibharti.in/worker-v4/captcha.php',
+
         submitUrl:
             'https://upanganwadibharti.in/worker-v4/users/submit_login.php'
     },
-    // {
-    //     registrationUrl:
-    //         'https://upanganwadibharti.in/workernew/users/registration.php',
-    //     captchaUrl:
-    //         'https://upanganwadibharti.in/workernew/captcha.php',
-    //     submitUrl:
-    //         'https://upanganwadibharti.in/workernew/users/submit_login.php'
-    // },
-    // {
-    //     registrationUrl:
-    //         'https://upanganwadibharti.in/helper-v2/users/registration.php',
-    //     captchaUrl:
-    //         'https://upanganwadibharti.in/helper-v2/captcha.php',
-    //     submitUrl:
-    //         'https://upanganwadibharti.in/helper-v2/users/submit_login.php'
-    // }
+    {
+        registrationUrl:
+            'https://upanganwadibharti.in/workernew/users/registration.php',
+
+        loginUrl:
+            'https://upanganwadibharti.in/workernew/users/login.php',
+
+        step1Url:
+            'https://upanganwadibharti.in/workernew/users/step-1.php',
+
+        captchaUrl:
+            'https://upanganwadibharti.in/workernew/captcha.php',
+
+        submitUrl:
+            'https://upanganwadibharti.in/workernew/users/submit_login.php'
+    },
+    {
+        registrationUrl:
+            'https://upanganwadibharti.in/helper-v2/users/registration.php',
+
+        loginUrl:
+            'https://upanganwadibharti.in/helper-v2/users/login.php',
+
+        step1Url:
+            'https://upanganwadibharti.in/helper-v2/users/step-1.php',
+
+        captchaUrl:
+            'https://upanganwadibharti.in/helper-v2/captcha.php',
+
+        submitUrl:
+            'https://upanganwadibharti.in/helper-v2/users/submit_login.php'
+    }
 ];
 
 export async function runUpAnganwadiScraper(): Promise<void> {
@@ -57,6 +81,8 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                 districtName: district.english,
 
                 sourceUrl: portal.registrationUrl,
+                loginUrl: portal.loginUrl,
+                step1Url: portal.step1Url,
                 captchaUrl: portal.captchaUrl,
                 submitUrl: portal.submitUrl
             });
