@@ -6,7 +6,7 @@ export interface AnganwadiProject {
     name: string;
 }
 
-export async function getAnganwadiProjects(
+export async function getGpWardProjects(
     ajaxUrl: string,
     distID: string,
     projectID: string,

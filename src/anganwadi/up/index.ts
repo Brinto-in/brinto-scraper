@@ -5,7 +5,7 @@ import {
 } from '../../database/repositories/anganwadi-district.repository.js';
 
 import { scrapeAnganwadiDistricts } from './district_scraper.js';
-import { getAnganwadiProjects } from './components/up_anganwadi_projects.js';
+import { getGpWardProjects } from './components/up_gp_ward_projects.js';
 import { registerAnganwadiDistrict } from './register/up_anganwadi_registration.js';
 import { fetchProjectsForDistrict } from './components/up_dist_projects.js';
 import { loginAnganwadiDistrict } from './login/up_anganwadi_login.js';
@@ -217,8 +217,8 @@ export async function runUpAnganwadiScraper(): Promise<void> {
 
             for (const project of result.projects ?? []) {
                 try {
-                    const projectResult =
-                        await getAnganwadiProjects(
+                    const gp_wards =
+                        await getGpWardProjects(
                             ajaxUrl,
                             result.district?.value,
                             project.value
@@ -232,7 +232,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                         `Project: ${project.value}`
                     );
 
-                    console.log(projectResult);
+                    console.log(gp_wards);
                     // console.log({
                     //     stateName: 'Uttar Pradesh',
                     //     districtName: district.districtName,
