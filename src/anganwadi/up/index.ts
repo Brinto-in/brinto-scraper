@@ -1,5 +1,6 @@
 import { gotScraping } from 'got-scraping';
 import * as cheerio from 'cheerio';
+import { upsertDistrict } from '../../database/repositories/anganwadi-district.repository.js';
 
 const TARGET_URLS = [
     'https://upanganwadibharti.in/worker-v4/users/registration.php',
@@ -156,7 +157,15 @@ async function scrapeAnganwadiDistricts(targetUrl: string): Promise<District[]> 
 
 async function main(): Promise<void> {
     for (const url of TARGET_URLS) {
-        await scrapeAnganwadiDistricts(url);
+        const districts = await scrapeAnganwadiDistricts(url);
+        for (const district of districts) {
+            await upsertDistrict({
+                state: 'UP',
+                districtId: district.id,
+                districtName: district.english,
+                sourceUrl: url
+            });
+        }
     }
 }
 
