@@ -5,6 +5,7 @@ import readline from 'readline';
 
 import type { PendingAnganwadiDistrict } from '../../database/repositories/anganwadi-district.repository.js';
 import { updateDistrictLogin } from '../../database/repositories/anganwadi-district.repository.js';
+import { solveImage } from '../../libs/img_to_numbers.js';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -126,19 +127,21 @@ export async function registerAnganwadiDistrict(
             `✓ CAPTCHA saved: ${captchaPath}`
         );
 
+        const captchaCode = await solveImage(captchaPath);
+
         // ========================================================
         // STEP 3: Manual CAPTCHA
         // ========================================================
 
-        console.log(
-            `\nOpen ${captchaPath} and enter the CAPTCHA.`
-        );
+        // console.log(
+        //     `\nOpen ${captchaPath} and enter the CAPTCHA.`
+        // );
 
-        const captcha = await askQuestion(
-            'CAPTCHA: '
-        );
+        // const captcha = await askQuestion(
+        //     'CAPTCHA: '
+        // );
 
-        if (!captcha) {
+        if (!captchaCode) {
             throw new Error('CAPTCHA cannot be empty');
         }
 
@@ -172,7 +175,7 @@ export async function registerAnganwadiDistrict(
                     aadhar: '',
                     emailid: '',
                     captchacode: '',
-                    captcha,
+                    captcha: captchaCode,
                     registration_submit: ''
                 },
 
