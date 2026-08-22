@@ -118,3 +118,51 @@ export async function updateDistrictLogin(
     ]
   });
 }
+
+export interface AnganwadiLoginDistrict {
+  id: number;
+  state: string;
+  districtId: string;
+  districtName: string;
+
+  loginUrl: string;
+  step1Url: string;
+
+  mobile: string;
+  password: string;
+}
+
+export async function getLoginDistricts(): Promise<
+  AnganwadiLoginDistrict[]
+> {
+  const result = await db.execute(`
+        SELECT
+            id,
+            state,
+            district_id,
+            district_name,
+            login_url,
+            step_1_url,
+            mobile,
+            password
+        FROM anganwadi_districts
+        WHERE mobile IS NOT NULL
+          AND password IS NOT NULL
+          AND mobile != ''
+          AND password != ''
+        ORDER BY id
+    `);
+
+  return result.rows.map((row) => ({
+    id: Number(row.id),
+    state: String(row.state),
+    districtId: String(row.district_id),
+    districtName: String(row.district_name),
+
+    loginUrl: String(row.login_url),
+    step1Url: String(row.step_1_url),
+
+    mobile: String(row.mobile),
+    password: String(row.password)
+  }));
+}

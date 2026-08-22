@@ -1,9 +1,11 @@
 import {
+    getLoginDistricts,
     getPendingDistricts,
     upsertDistrict
 } from '../../database/repositories/anganwadi-district.repository.js';
 
 import { scrapeAnganwadiDistricts } from './district_scraper.js';
+import { loginAnganwadiDistrict } from './up_anganwadi_login.js';
 import { registerAnganwadiDistrict } from './up_anganwadi_registration.js';
 
 const PORTALS = [
@@ -139,4 +141,35 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     console.log('\n==============================================');
     console.log('UP ANGANWADI PROCESS COMPLETED');
     console.log('==============================================');
+
+    // ============================================================
+    // STEP 4: LOGIN DISTRICTS
+    // ============================================================
+
+    console.log('\n==============================================');
+    console.log('UP ANGANWADI - LOGIN');
+    console.log('==============================================');
+
+    const loginDistricts = await getLoginDistricts();
+
+    console.log(
+        `Found ${loginDistricts.length} districts with credentials`
+    );
+
+    for (const district of loginDistricts) {
+
+        try {
+
+            await loginAnganwadiDistrict(district);
+
+        } catch (error) {
+
+            console.error(
+                `Login failed for ${district.districtName}:`,
+                error instanceof Error
+                    ? error.message
+                    : error
+            );
+        }
+    }
 }
