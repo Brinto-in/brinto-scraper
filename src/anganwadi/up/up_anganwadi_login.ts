@@ -1,9 +1,24 @@
 import { gotScraping } from 'got-scraping';
 import * as cheerio from 'cheerio';
+import fs from 'fs';
+import readline from 'readline';
 
 import type {
     AnganwadiLoginDistrict
 } from '../../database/repositories/anganwadi-district.repository.js';
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function askQuestion(question: string): Promise<string> {
+    return new Promise((resolve) => {
+        rl.question(question, (answer) => {
+            resolve(answer.trim());
+        });
+    });
+}
 
 export interface LoginResult {
     success: boolean;
@@ -31,7 +46,7 @@ export async function loginAnganwadiDistrict(
         // STEP 1: Open login page
         // ========================================================
 
-        console.log('\n[1/3] Opening login page...');
+        console.log('\n[1/4] Opening login page...');
 
         const pageResponse = await gotScraping({
             url: district.loginUrl,
@@ -60,43 +75,191 @@ export async function loginAnganwadiDistrict(
         );
 
         // ========================================================
-        // STEP 2: Find login form
+        // STEP 2: Get CSRF token
         // ========================================================
 
-        console.log('\n[2/3] Parsing login form...');
+        console.log('\n[2/4] Reading login form...');
 
-        const form = $('form').first();
+        const token =
+            $('input[name="_token"]').attr('value') ?? '';
 
-        if (form.length === 0) {
-            throw new Error('Login form not found');
+        if (!token) {
+            throw new Error(
+                'Login CSRF token not found'
+            );
         }
 
-        console.log('✓ Login form found');
+        console.log('✓ CSRF token found');
 
-        // We'll inspect the actual field names before submitting.
-        console.log('\nLogin form fields:');
+        // ========================================================
+        // STEP 3: CAPTCHA
+        // ========================================================
 
-        form.find('input').each((_, element) => {
-            const name = $(element).attr('name') ?? '';
-            const type = $(element).attr('type') ?? 'text';
+        console.log('\n[3/4] CAPTCHA required');
 
-            console.log(
-                `  ${name} (${type})`
-            );
+        /*
+         * Use the CAPTCHA endpoint associated with this portal.
+         *
+         * The CAPTCHA must be entered manually.
+         */
+
+        const captchaResponse = await gotScraping({
+            url: district.captchaUrl,
+
+            responseType: 'buffer',
+
+            headers: {
+                Cookie: sessionCookie,
+                Referer: district.loginUrl
+            },
+
+            https: {
+                rejectUnauthorized: false
+            }
         });
 
+        const captchaPath =
+            `login_captcha_${district.id}.png`;
+
+        fs.writeFileSync(
+            captchaPath,
+            captchaResponse.body
+        );
+
+        console.log(
+            `✓ CAPTCHA saved: ${captchaPath}`
+        );
+
+        const captcha = await askQuestion(
+            'Enter CAPTCHA: '
+        );
+
+        if (!captcha) {
+            throw new Error(
+                'CAPTCHA cannot be empty'
+            );
+        }
+
         // ========================================================
-        // STEP 3: Login
+        // STEP 4: Submit login
         // ========================================================
 
-        console.log('\n[3/3] Login submission will be added after');
-        console.log('      confirming the portal field names.');
+        console.log('\n[4/4] Submitting login...');
+
+        const loginResponse = await gotScraping.post(
+            district.loginUrl,
+            {
+                headers: {
+                    Cookie: sessionCookie,
+                    Referer: district.loginUrl,
+                    Origin: 'https://upanganwadibharti.in'
+                },
+
+                form: {
+                    _token: token,
+                    user_id: district.mobile,
+                    pass: district.password,
+                    captcha
+                },
+
+                https: {
+                    rejectUnauthorized: false
+                },
+
+                followRedirect: true
+            }
+        );
+
+        console.log(
+            `HTTP ${loginResponse.statusCode}`
+        );
+
+        console.log(
+            `Final URL: ${loginResponse.url}`
+        );
+
+        // Combine initial + redirect cookies if provided.
+        const responseCookies =
+            loginResponse.headers['set-cookie'];
+
+        const newCookies = Array.isArray(responseCookies)
+            ? responseCookies
+                .map((cookie) => String(cookie).split(';')[0])
+                .join('; ')
+            : '';
+
+        const cookies = [
+            sessionCookie,
+            newCookies
+        ]
+            .filter(Boolean)
+            .join('; ');
+
+        // ========================================================
+        // Determine login result
+        // ========================================================
+
+        const finalUrl = loginResponse.url.toLowerCase();
+
+        const body = loginResponse.body.toLowerCase();
+
+        const loginFailed =
+            body.includes('invalid captcha') ||
+            body.includes('invalid password') ||
+            body.includes('invalid user') ||
+            body.includes('incorrect') ||
+            body.includes('login failed');
+
+        if (loginFailed) {
+
+            console.log(
+                '✗ Login failed'
+            );
+
+            console.log(
+                loginResponse.body.slice(0, 1000)
+            );
+
+            return {
+                success: false,
+                districtId: district.districtId,
+                districtName: district.districtName,
+                cookies
+            };
+        }
+
+        /*
+         * If the portal redirects away from login.php,
+         * that is a strong indication that login succeeded.
+         */
+        const redirectedAwayFromLogin =
+            !finalUrl.includes('/users/login.php');
+
+        const success =
+            redirectedAwayFromLogin;
+
+        if (success) {
+
+            console.log(
+                '✓ Login successful'
+            );
+
+            console.log(
+                `✓ Session URL: ${loginResponse.url}`
+            );
+
+        } else {
+
+            console.log(
+                '⚠ Login result could not be confirmed'
+            );
+        }
 
         return {
-            success: false,
+            success,
             districtId: district.districtId,
             districtName: district.districtName,
-            cookies: sessionCookie
+            cookies
         };
 
     } catch (error) {
@@ -114,5 +277,8 @@ export async function loginAnganwadiDistrict(
             districtName: district.districtName,
             cookies: ''
         };
+
+    } finally {
+        rl.close();
     }
 }

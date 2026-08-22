@@ -127,6 +127,7 @@ export interface AnganwadiLoginDistrict {
 
   loginUrl: string;
   step1Url: string;
+  captchaUrl: string;
 
   mobile: string;
   password: string;
@@ -143,6 +144,7 @@ export async function getLoginDistricts(): Promise<
             district_name,
             login_url,
             step_1_url,
+            captcha_url,
             mobile,
             password
         FROM anganwadi_districts
@@ -161,6 +163,7 @@ export async function getLoginDistricts(): Promise<
 
     loginUrl: String(row.login_url),
     step1Url: String(row.step_1_url),
+    captchaUrl: String(row.captcha_url),
 
     mobile: String(row.mobile),
     password: String(row.password)

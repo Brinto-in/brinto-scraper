@@ -155,8 +155,10 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     console.log(
         `Found ${loginDistricts.length} districts with credentials`
     );
+    let dist_: any = [];
+    dist_.push(loginDistricts[0]);
 
-    for (const district of loginDistricts) {
+    for (const district of dist_) {
 
         try {
 
