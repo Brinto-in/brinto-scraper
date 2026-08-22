@@ -1,0 +1,43 @@
+{
+  "name": "brinto-scraper",
+  "version": "1.0.0",
+  "description": "Brinto web scraping service",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brinto-in/brinto-scraper.git"
+  },
+  "keywords": [
+    "scraper",
+    "web-scraping",
+    "nodejs",
+    "typescript"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "bugs": {
+    "url": "https://github.com/Brinto-in/brinto-scraper/issues"
+  },
+  "homepage": "https://github.com/Brinto-in/brinto-scraper#readme",
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "got-scraping": "^4.2.1"
+  }
+}
