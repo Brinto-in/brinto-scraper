@@ -378,4 +378,9 @@ async function main() {
   await syncRecordsToApi(allRows);
 }
 
+// main().catch((err) => {
+//   console.error(err);
+//   process.exit(1);
+// });
+
 module.exports = { main };

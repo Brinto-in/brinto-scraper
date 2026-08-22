@@ -6,7 +6,7 @@ const CONFLICT_COLUMNS = ['state_name', 'district_name', 'project_name', 'sector
 async function setupAnganwadiCentersTable() {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            id              INTEGER PRIMARY KEY,
             state_name      TEXT NOT NULL,
             district_name   TEXT NOT NULL,
             project_name    TEXT NOT NULL,
@@ -33,8 +33,8 @@ async function setupAnganwadiCentersTable() {
 
 /**
  * Upserts a center and returns its id.
- * Uses a SELECT-after-upsert since libSQL batch inserts don't return lastInsertRowid reliably on conflict.
- * Expects: { state_name, district_name, project_name, sector_name, awc_name }
+ * Checks for existing record first to prevent SQLite from advancing sequence on duplicate attempts.
+ * Expects: { state_name, district_name, project_name, sector_name, gp, awc_name }
  */
 async function upsertCenter(center) {
     const payload = {
@@ -45,19 +45,44 @@ async function upsertCenter(center) {
         gp: center.gp ?? '',
         awc_name: center.awc_name ?? null,
     };
-    // console.log(payload);
+
+    const existing = await db.execute({
+        sql: `
+            SELECT id FROM ${TABLE_NAME}
+            WHERE state_name    = ?
+              AND district_name = ?
+              AND project_name  = ?
+              AND sector_name   = ?
+              AND gp            = ?
+              AND awc_name      = ?
+            LIMIT 1;
+        `,
+        args: [payload.state_name, payload.district_name, payload.project_name, payload.sector_name, payload.gp, payload.awc_name],
+    });
+
+    if (existing.rows.length > 0) {
+        const id = existing.rows[0].id;
+        await db.execute({
+            sql: `UPDATE ${TABLE_NAME} SET updatedAt = datetime('now') WHERE id = ?;`,
+            args: [id],
+        });
+        return id;
+    }
+
     const columns = Object.keys(payload);
     const placeholders = columns.map(() => '?').join(', ');
 
-    await db.execute({
+    const insertResult = await db.execute({
         sql: `
             INSERT INTO ${TABLE_NAME} (${columns.join(', ')})
-            VALUES (${placeholders})
-            ON CONFLICT (${CONFLICT_COLUMNS.join(', ')})
-            DO UPDATE SET updatedAt = datetime('now');
+            VALUES (${placeholders});
         `,
         args: Object.values(payload),
     });
+
+    if (insertResult.lastInsertRowid !== undefined && insertResult.lastInsertRowid !== null) {
+        return Number(insertResult.lastInsertRowid);
+    }
 
     const result = await db.execute({
         sql: `
@@ -68,6 +93,7 @@ async function upsertCenter(center) {
               AND sector_name   = ?
               AND gp            = ?
               AND awc_name      = ?
+            LIMIT 1;
         `,
         args: [payload.state_name, payload.district_name, payload.project_name, payload.sector_name, payload.gp, payload.awc_name],
     });

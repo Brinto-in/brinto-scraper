@@ -6,7 +6,7 @@ const CONFLICT_COLUMNS = ['center_id', 'post_code'];
 async function setupAnganwadiVacanciesTable() {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            id              INTEGER PRIMARY KEY,
             center_id       INTEGER NOT NULL REFERENCES anganwadi_centers(id) ON DELETE CASCADE,
             post_code       TEXT NOT NULL,
             post_name       TEXT NOT NULL,

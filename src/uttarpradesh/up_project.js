@@ -2,7 +2,6 @@ const cheerio = require('cheerio');
 
 const STEP1_URLS = {
     AWW: 'https://upanganwadibharti.in/workernew/users/step-1.php', // Anganwadi Worker
-    AWH: 'https://upanganwadibharti.in/helper-v2/users/step-1.php',   // Anganwadi Helper
 };
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -18,8 +17,10 @@ const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
  * @param {string}  [session.postCode='AWW'] - 'AWW' or 'AWH' to determine the correct URL.
  * @returns {{ district: { name, value } | null, projects: Array<{ value, name }> }}
  */
-async function fetchProjectsForDistrict(httpClient, { districtName, cfClearanceToken, sessionId, postCode = 'AWW' }) {
-    const step1Url = STEP1_URLS[postCode];
+async function fetchProjectsForDistrict(httpClient, { districtName, cfClearanceToken, sessionId, stepUrl, postCode = 'AWW' }) {
+    console.log(stepUrl);
+    const step1Url = stepUrl ?? STEP1_URLS[postCode];
+    console.log(step1Url);
     if (!step1Url) throw new Error(`Invalid postCode "${postCode}" provided. Must be one of ${Object.keys(STEP1_URLS).join(', ')}`);
 
     try {

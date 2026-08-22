@@ -8,7 +8,7 @@ const upSessions = require('./up_sessions');
 const MAX_LOGIN_RETRIES = 3;
 
 // Set to true to filter sessions starting strictly today
-const ONLY_TODAY_START = true;
+const ONLY_TODAY_START = false;
 
 /** Returns sessions matching active date criteria */
 function getActiveSessions() {

@@ -1,16 +1,16 @@
 const cheerio = require('cheerio');
 const { solveCaptcha } = require('../login/img_to_number');
 
-const LOGIN_URL = 'https://upanganwadibharti.in/helper-v2/users/login.php';
-const CAPTCHA_URL = 'https://upanganwadibharti.in/helper-v2/captcha.php';
-const SUBMIT_URL = 'https://upanganwadibharti.in/helper-v2/users/submit_login.php';
+// const LOGIN_URL = 'https://upanganwadibharti.in/helper-v2/users/login.php';
+// const CAPTCHA_URL = 'https://upanganwadibharti.in/helper-v2/captcha.php';
+// const SUBMIT_URL = 'https://upanganwadibharti.in/helper-v2/users/submit_login.php';
 
 /**
  * Logs in with mobile/password for AWH, solves the captcha via OCR,
  * and returns fresh session cookies on success.
  * @throws if login fails or captcha is unresolvable
  */
-async function loginAwhWithoutChromium(mobile, password) {
+async function loginAwhWithoutChromium(mobile, password, LOGIN_URL, CAPTCHA_URL, SUBMIT_URL) {
     const { gotScraping } = await import('got-scraping');
     const { CookieJar } = await import('tough-cookie');
 
@@ -71,13 +71,13 @@ if (require.main === module) {
         for (const session of sessions) {
             console.log(`\n--- Attempting login for ${session.districtName} (${session.mobile}) ---`);
             try {
-                const loginResult = await loginAwhWithoutChromium(session.mobile, session.password);
+                const loginResult = await loginAwhWithoutChromium(session.mobile, session.password, session.LOGIN_URL, session.CAPTCHA_URL, session.SUBMIT_URL);
                 console.log('✅ Login successful!');
                 console.log(JSON.stringify(loginResult, null, 2));
 
                 // After login, fetch the projects for this session
                 console.log('  Fetching projects...');
-                const fullSession = { ...session, ...loginResult, postCode: 'AWH' };
+                const fullSession = { ...session, ...loginResult, postCode: 'AWH', stepUrl: session.step1Url};
                 const { district, projects } = await fetchProjectsForDistrict(gotScraping, fullSession);
 
                 if (district) {
