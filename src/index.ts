@@ -12,9 +12,12 @@ console.log(`Node.js: ${process.version}`);
 console.log('Scraper is running...');
 
 import { runUpAnganwadiScraper } from './anganwadi/up/index.js';
+import { runTelanganaAnganwadi } from './anganwadi/telangana/index.js';
 
 async function main(): Promise<void> {
-    await runUpAnganwadiScraper();
+    // await runUpAnganwadiScraper();
+    // Later:
+    await runTelanganaAnganwadi();
 }
 
 main().catch((error) => {
