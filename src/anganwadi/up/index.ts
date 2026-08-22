@@ -11,6 +11,7 @@ import { fetchProjectsForDistrict } from './components/up_dist_projects.js';
 import { loginAnganwadiDistrict } from './login/up_anganwadi_login.js';
 import { getAnganwadis } from './components/anganwadi_gp_projects.js';
 import { upsertAnganwadiCenter } from '../../database/repositories/anganwadi-center.repository.js';
+import { insertAnganwadiVacancy } from '../../database/repositories/anganwadi-vacancy.repository.js';
 
 const PORTALS = [
     {
@@ -216,13 +217,22 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                                     // Map each Anganwadi to an async upsert task and await all of them concurrently
                                     await Promise.all(
                                         (anganwadis ?? []).map(async (awc: any) => {
-                                            await upsertAnganwadiCenter({
+                                            const centerId = await upsertAnganwadiCenter({
                                                 stateName: 'Uttar Pradesh',
                                                 districtName: district.districtName,
                                                 projectName: project.name,
                                                 sectorName: '',
                                                 gp: gpWard.name,
                                                 awcName: awc.name
+                                            });
+                                            await insertAnganwadiVacancy({
+                                                centerId,
+                                                postCode: postCode,
+                                                postName: postCode === 'AWH' ? 'Helper' : 'Worker',
+                                                vacancyCount: 1,
+                                                status: 'open',
+                                                startDate: '2026-09-01',
+                                                endDate: '2026-09-01'
                                             });
                                         })
                                     );
