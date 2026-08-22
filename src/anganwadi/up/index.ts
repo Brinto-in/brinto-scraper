@@ -158,11 +158,11 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     let dist_: any = [];
     dist_.push(loginDistricts[0]);
 
-    for (const district of dist_) {
+    for (const district of loginDistricts) {
 
         try {
 
-            const login_result = await loginAnganwadiDistrict('5555555503', 'Test@1234');
+            const login_result = await loginAnganwadiDistrict(district.mobile, district.password, district.loginUrl, district.captchaUrl, district.submitUrl);
             console.log(login_result);
             
         } catch (error) {
