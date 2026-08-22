@@ -1,10 +1,9 @@
 import * as cheerio from 'cheerio';
-// @ts-ignore - Replace with proper import path or type declaration if available
-import { solveCaptcha } from '../login/img_to_number';
+import { solveImage } from '../../libs/img_to_numbers.js';
 
-const DEFAULT_LOGIN_URL = 'https://upanganwadibharti.in/helper-v2/users/login.php';
-const DEFAULT_CAPTCHA_URL = 'https://upanganwadibharti.in/helper-v2/captcha.php';
-const DEFAULT_SUBMIT_URL = 'https://upanganwadibharti.in/helper-v2/users/submit_login.php';
+const DEFAULT_LOGIN_URL = 'https://upanganwadibharti.in/workernew/users/login.php';
+const DEFAULT_CAPTCHA_URL = 'https://upanganwadibharti.in/workernew/captcha.php';
+const DEFAULT_SUBMIT_URL = 'https://upanganwadibharti.in/workernew/users/submit_login.php';
 
 export interface LoginResult {
     cfClearanceToken: string | null;
@@ -16,7 +15,7 @@ export interface LoginResult {
  * and returns fresh session cookies on success.
  * @throws if login fails or captcha is unresolvable
  */
-export async function loginAwhWithoutChromium(
+export async function loginAnganwadiDistrict(
     mobile: string,
     password: string,
     loginUrl: string = DEFAULT_LOGIN_URL,
@@ -37,7 +36,7 @@ export async function loginAwhWithoutChromium(
 
     // Step 2 — download & OCR the captcha
     const captchaImg = await gotScraping({ url: captchaUrl, cookieJar, responseType: 'buffer' });
-    const captchaCode: string = await solveCaptcha(captchaImg.body);
+    const captchaCode: string = await solveImage(captchaImg.body);
     console.log(`   🔍 Captcha: ${captchaCode}`);
     if (!captchaCode || captchaCode.length < 4) {
         throw new Error(`Invalid captcha: "${captchaCode}"`);
@@ -68,7 +67,7 @@ export async function loginAwhWithoutChromium(
     const hdrs = (post.headers['set-cookie'] as string[]) || [];
     const map: Record<string, string> = Object.fromEntries(jar.map((c) => [c.key, c.value]));
 
-    hdrs.forEach((sc) => {
+    hdrs.forEach((sc: any) => {
         const [k, v] = sc.split(';')[0].split('=');
         if (k && v) map[k.trim()] = v.trim();
     });

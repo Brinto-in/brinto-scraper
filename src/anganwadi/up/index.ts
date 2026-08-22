@@ -162,7 +162,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
 
         try {
 
-            const login_result = await loginAnganwadiDistrict(district.mobile, district.password, 'https://upanganwadibharti.in/worker-v4/users/login.php', 'https://upanganwadibharti.in/worker-v4/captcha.php', 'https://upanganwadibharti.in/worker-v4/users/submit_login.php');
+            const login_result = await loginAnganwadiDistrict('5555555503', 'Test@1234');
             console.log(login_result);
             
         } catch (error) {
