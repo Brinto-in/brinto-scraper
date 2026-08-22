@@ -5,6 +5,10 @@ export interface AnganwadiDistrict {
   districtId: string;
   districtName: string;
   sourceUrl: string;
+  captchaUrl: string;
+  submitUrl: string;
+  mobile?: string;
+  password?: string;
 }
 
 export async function upsertDistrict(
@@ -16,20 +20,91 @@ export async function upsertDistrict(
         state,
         district_id,
         district_name,
-        source_url
+        source_url,
+        captcha_url,
+        submit_url,
+        mobile,
+        password
       )
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 
       ON CONFLICT(state, district_id, source_url)
       DO UPDATE SET
         district_name = excluded.district_name,
+        captcha_url = excluded.captcha_url,
+        submit_url = excluded.submit_url,
         updated_at = CURRENT_TIMESTAMP
     `,
     args: [
       district.state,
       district.districtId,
       district.districtName,
-      district.sourceUrl
+      district.sourceUrl,
+      district.captchaUrl,
+      district.submitUrl,
+      district.mobile ?? null,
+      district.password ?? null
+    ]
+  });
+}
+
+export interface PendingAnganwadiDistrict {
+  id: number;
+  state: string;
+  districtId: string;
+  districtName: string;
+  sourceUrl: string;
+  captchaUrl: string;
+  submitUrl: string;
+}
+
+export async function getPendingDistricts(): Promise<
+  PendingAnganwadiDistrict[]
+> {
+  const result = await db.execute(`
+    SELECT
+      id,
+      state,
+      district_id,
+      district_name,
+      source_url,
+      captcha_url,
+      submit_url
+    FROM anganwadi_districts
+    WHERE mobile IS NULL
+      AND password IS NULL
+    ORDER BY id
+  `);
+
+  return result.rows.map((row) => ({
+    id: Number(row.id),
+    state: String(row.state),
+    districtId: String(row.district_id),
+    districtName: String(row.district_name),
+    sourceUrl: String(row.source_url),
+    captchaUrl: String(row.captcha_url),
+    submitUrl: String(row.submit_url)
+  }));
+}
+
+export async function updateDistrictLogin(
+  id: number,
+  mobile: string,
+  password: string
+): Promise<void> {
+  await db.execute({
+    sql: `
+            UPDATE anganwadi_districts
+            SET
+                mobile = ?,
+                password = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `,
+    args: [
+      mobile,
+      password,
+      id
     ]
   });
 }

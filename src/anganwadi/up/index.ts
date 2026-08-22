@@ -1,172 +1,116 @@
-import { gotScraping } from 'got-scraping';
-import * as cheerio from 'cheerio';
-import { upsertDistrict } from '../../database/repositories/anganwadi-district.repository.js';
+import {
+    getPendingDistricts,
+    upsertDistrict
+} from '../../database/repositories/anganwadi-district.repository.js';
 
-const TARGET_URLS = [
-    'https://upanganwadibharti.in/worker-v4/users/registration.php',
-    'https://upanganwadibharti.in/helper-v2/users/registration.php',
-    'https://upanganwadibharti.in/workernew/users/registration.php'
+import { scrapeAnganwadiDistricts } from './district_scraper.js';
+import { registerAnganwadiDistrict } from './up_anganwadi_registration.js';
+
+const PORTALS = [
+    {
+        registrationUrl:
+            'https://upanganwadibharti.in/worker-v4/users/registration.php',
+        captchaUrl:
+            'https://upanganwadibharti.in/worker-v4/captcha.php',
+        submitUrl:
+            'https://upanganwadibharti.in/worker-v4/users/submit_login.php'
+    },
+    // {
+    //     registrationUrl:
+    //         'https://upanganwadibharti.in/workernew/users/registration.php',
+    //     captchaUrl:
+    //         'https://upanganwadibharti.in/workernew/captcha.php',
+    //     submitUrl:
+    //         'https://upanganwadibharti.in/workernew/users/submit_login.php'
+    // },
+    // {
+    //     registrationUrl:
+    //         'https://upanganwadibharti.in/helper-v2/users/registration.php',
+    //     captchaUrl:
+    //         'https://upanganwadibharti.in/helper-v2/captcha.php',
+    //     submitUrl:
+    //         'https://upanganwadibharti.in/helper-v2/users/submit_login.php'
+    // }
 ];
 
-interface District {
-    index: number;
-    id: string;
-    english: string;
-    hindi: string;
-    rawText: string;
-}
+export async function runUpAnganwadiScraper(): Promise<void> {
 
-async function scrapeAnganwadiDistricts(targetUrl: string): Promise<District[]> {
-    console.log('\n' + '='.repeat(70));
-    console.log('UP ANGANWADI BHARTI - DISTRICT SCRAPER');
-    console.log('URL:', targetUrl);
-    console.log('='.repeat(70));
+    // ============================================================
+    // STEP 1: SCRAPE DISTRICTS
+    // ============================================================
 
-    try {
-        console.log('\n[1/3] Sending request...');
+    console.log('\n==============================================');
+    console.log('UP ANGANWADI - DISTRICT SCRAPING');
+    console.log('==============================================');
 
-        const response = await gotScraping({
-            url: targetUrl,
-            timeout: {
-                request: 15000
-            },
-            https: {
-                rejectUnauthorized: false
-            },
-            headers: {
-                'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'
-            }
-        });
+    for (const portal of PORTALS) {
 
-        console.log(
-            `[2/3] Status: ${response.statusCode} (${(
-                response.body.length / 1024
-            ).toFixed(2)} KB)`
+        const districts = await scrapeAnganwadiDistricts(
+            portal.registrationUrl
         );
 
-        const $ = cheerio.load(response.body);
-
-        let selectEl = $(
-            'select[name*="district" i], ' +
-            'select[id*="district" i], ' +
-            'select[name*="jila" i]'
-        );
-
-        // Try to find district dropdown based on surrounding text
-        if (selectEl.length === 0) {
-            $('select').each((_, el) => {
-                const parentText = $(el).parent().text();
-
-                if (
-                    parentText.includes('District') ||
-                    parentText.includes('जिला') ||
-                    parentText.includes('जिले')
-                ) {
-                    selectEl = $(el);
-                    return false;
-                }
-            });
-        }
-
-        // Fallback: select with multiple options
-        if (selectEl.length === 0) {
-            $('select').each((_, el) => {
-                if ($(el).find('option').length > 1) {
-                    selectEl = $(el);
-                    return false;
-                }
-            });
-        }
-
-        const districts: District[] = [];
-
-        if (selectEl.length > 0) {
-            selectEl.find('option').each((_, opt) => {
-                const id = $(opt).attr('value')?.trim() ?? '';
-                const rawText = $(opt).text().trim();
-
-                // Ignore empty/default option
-                if (!id && !rawText) {
-                    return;
-                }
-
-                if (
-                    !id &&
-                    (
-                        rawText.toLowerCase().includes('select') ||
-                        rawText.includes('चुनें') ||
-                        rawText.includes('विकल्प') ||
-                        rawText.includes('--')
-                    )
-                ) {
-                    return;
-                }
-
-                let english = rawText;
-                let hindi = '';
-
-                // Example: Agra / आगरा
-                if (rawText.includes('/')) {
-                    const parts = rawText.split('/');
-
-                    english = parts[0]?.trim() ?? '';
-                    hindi = parts.slice(1).join('/').trim();
-                }
-
-                // Example: Agra (आगरा)
-                else if (rawText.includes('(') && rawText.includes(')')) {
-                    const match: any = rawText.match(/(.*?)\((.*?)\)/);
-
-                    if (match) {
-                        english = match[1].trim();
-                        hindi = match[2].trim();
-                    }
-                }
-
-                districts.push({
-                    index: districts.length + 1,
-                    id,
-                    english,
-                    hindi,
-                    rawText
-                });
-            });
-        }
-
-        console.log(
-            `[3/3] Found ${districts.length} district options`
-        );
-
-        if (districts.length > 0) {
-            console.table(districts);
-        } else {
-            console.log('No district options found.');
-        }
-
-        return districts;
-
-    } catch (error) {
-        console.error(
-            `Failed to scrape ${targetUrl}:`,
-            error instanceof Error ? error.message : error
-        );
-
-        return [];
-    }
-}
-
-async function main(): Promise<void> {
-    for (const url of TARGET_URLS) {
-        const districts = await scrapeAnganwadiDistricts(url);
         for (const district of districts) {
+
             await upsertDistrict({
                 state: 'UP',
                 districtId: district.id,
                 districtName: district.english,
-                sourceUrl: url
+
+                sourceUrl: portal.registrationUrl,
+                captchaUrl: portal.captchaUrl,
+                submitUrl: portal.submitUrl
             });
         }
     }
-}
 
-main();
+    // ============================================================
+    // STEP 2: GET DISTRICTS WITHOUT LOGIN DETAILS
+    // ============================================================
+
+    console.log('\n==============================================');
+    console.log('UP ANGANWADI - PENDING REGISTRATIONS');
+    console.log('==============================================');
+
+    const pendingDistricts = await getPendingDistricts();
+
+    console.log(
+        `Found ${pendingDistricts.length} districts pending registration`
+    );
+
+    // ============================================================
+    // STEP 3: REGISTER PENDING DISTRICTS
+    // ============================================================
+
+    for (const district of pendingDistricts) {
+
+        console.log('\n----------------------------------------------');
+        console.log(
+            `Registering: ${district.districtName}`
+        );
+        console.log(
+            `District ID: ${district.districtId}`
+        );
+        console.log(
+            `Source: ${district.sourceUrl}`
+        );
+        console.log('----------------------------------------------');
+
+        try {
+
+            await registerAnganwadiDistrict(district);
+
+        } catch (error) {
+
+            console.error(
+                `Registration failed for ${district.districtName}:`,
+                error instanceof Error
+                    ? error.message
+                    : error
+            );
+        }
+    }
+
+    console.log('\n==============================================');
+    console.log('UP ANGANWADI PROCESS COMPLETED');
+    console.log('==============================================');
+}

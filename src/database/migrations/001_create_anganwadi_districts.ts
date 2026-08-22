@@ -8,7 +8,10 @@ export async function createAnganwadiDistrictsTable(): Promise<void> {
       state TEXT NOT NULL,
       district_id TEXT NOT NULL,
       district_name TEXT NOT NULL,
+
       source_url TEXT NOT NULL,
+      captcha_url TEXT NOT NULL,
+      submit_url TEXT NOT NULL,
 
       mobile TEXT,
       password TEXT,
