@@ -105,12 +105,13 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     console.log('UP ANGANWADI - PENDING REGISTRATIONS');
     console.log('==============================================');
 
-    const pendingDistricts = await getPendingDistricts();
+    const pendingDistricts = await getPendingDistricts('UP');
 
     console.log(
         `Found ${pendingDistricts.length} districts pending registration`
     );
 
+    // return
     // ============================================================
     // STEP 3: REGISTER PENDING DISTRICTS
     // ============================================================
@@ -159,7 +160,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
     const loginDistricts = await getLoginDistricts();
 
     console.log(loginDistricts);
-    
+
     console.log(
         `Found ${loginDistricts.length} districts with credentials`
     );

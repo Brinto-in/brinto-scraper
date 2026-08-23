@@ -68,23 +68,27 @@ export interface PendingAnganwadiDistrict {
   submitUrl: string;
 }
 
-export async function getPendingDistricts(): Promise<
-  PendingAnganwadiDistrict[]
-> {
-  const result = await db.execute(`
-    SELECT
-      id,
-      state,
-      district_id,
-      district_name,
-      source_url,
-      captcha_url,
-      submit_url
-    FROM anganwadi_districts
-    WHERE mobile IS NULL
-      AND password IS NULL
-    ORDER BY id
-  `);
+export async function getPendingDistricts(
+  state: string
+): Promise<PendingAnganwadiDistrict[]> {
+  const result = await db.execute({
+    sql: `
+      SELECT
+        id,
+        state,
+        district_id,
+        district_name,
+        source_url,
+        captcha_url,
+        submit_url
+      FROM anganwadi_districts
+      WHERE mobile IS NULL
+        AND password IS NULL
+        AND state = ?
+      ORDER BY id
+    `,
+    args: [state]
+  });
 
   return result.rows.map((row) => ({
     id: Number(row.id),

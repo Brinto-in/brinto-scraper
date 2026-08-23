@@ -13,11 +13,12 @@ console.log('Scraper is running...');
 
 import { runUpAnganwadiScraper } from './anganwadi/up/index.js';
 import { runTelanganaAnganwadi } from './anganwadi/telangana/index.js';
+import { runOdishaAnganwadi } from './anganwadi/odisha/index.js';
 
 async function main(): Promise<void> {
-    await runUpAnganwadiScraper();
-    // Later:
+    // await runUpAnganwadiScraper();
     // await runTelanganaAnganwadi();
+    await runOdishaAnganwadi();
 }
 
 main().catch((error) => {
