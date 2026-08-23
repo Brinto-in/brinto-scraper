@@ -226,6 +226,7 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                                                 projectName: project.name,
                                                 sectorName: '',
                                                 gp: gpWard.name,
+                                                area: '',
                                                 awcName: awc.name
                                             });
                                             await insertAnganwadiVacancy({
