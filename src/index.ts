@@ -18,7 +18,7 @@ import { runOdishaAnganwadi } from './anganwadi/odisha/index.js';
 async function main(): Promise<void> {
     // await runUpAnganwadiScraper();
     // await runTelanganaAnganwadi();
-    await runOdishaAnganwadi();
+    // await runOdishaAnganwadi();
 }
 
 main().catch((error) => {
