@@ -4,7 +4,6 @@ import { createAnganwadiVacanciesTable } from './database/tables/anganwadi-vacan
 // await createAnganwadiDistrictsTable();
 // await createAnganwadiCentersTable();
 // await createAnganwadiVacanciesTable();
-import './anganwadi/up/index.js';
 console.log('=================================');
 console.log('BRINTO SCRAPER');
 console.log('=================================');
@@ -16,8 +15,8 @@ import { runTelanganaAnganwadi } from './anganwadi/telangana/index.js';
 import { runOdishaAnganwadi } from './anganwadi/odisha/index.js';
 
 async function main(): Promise<void> {
-    await runUpAnganwadiScraper();
-    // await runTelanganaAnganwadi();
+    // await runUpAnganwadiScraper();
+    await runTelanganaAnganwadi();
     // await runOdishaAnganwadi();
 }
 

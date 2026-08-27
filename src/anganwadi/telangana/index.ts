@@ -2,6 +2,7 @@ import { scrapeTelanganaDistricts } from './district_scraper.js';
 import {
     upsertTelanganaDistrict
 } from '../../database/repositories/anganwadi-district.repository.js';
+import { scrapeTelanganaAnganwadi } from './scraper.js';
 
 export async function runTelanganaAnganwadi(): Promise<void> {
 
@@ -36,4 +37,6 @@ export async function runTelanganaAnganwadi(): Promise<void> {
     console.log(
         `✓ Telangana districts processed: ${districts.length}`
     );
+
+    await scrapeTelanganaAnganwadi();
 }
