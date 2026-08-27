@@ -169,6 +169,11 @@ export async function runUpAnganwadiScraper(): Promise<void> {
 
     // Cache static dynamic URLs or utilities outside the loop if possible
     for (const district of loginDistricts) {
+        // if (district.districtName !== 'Banda') {
+        //     continue
+        // }
+        console.log(district.districtName, district.start_date, district.end_date);
+
         try {
             // 1. Authenticate District
             const loginResult = await loginAnganwadiDistrict(
@@ -216,6 +221,8 @@ export async function runUpAnganwadiScraper(): Promise<void> {
                                         project.value,
                                         districtVal
                                     );
+
+                                    console.log(anganwadis);
 
                                     // Map each Anganwadi to an async upsert task and await all of them concurrently
                                     await Promise.all(

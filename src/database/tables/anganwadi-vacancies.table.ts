@@ -3,7 +3,7 @@ import { db } from '../../config/database.js';
 export async function createAnganwadiVacanciesTable(): Promise<void> {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS anganwadi_vacancies (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
 
             center_id INTEGER NOT NULL
                 REFERENCES anganwadi_centers(id)

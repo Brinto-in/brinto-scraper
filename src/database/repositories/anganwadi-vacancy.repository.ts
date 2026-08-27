@@ -31,7 +31,12 @@ export async function insertAnganwadiVacancy(
                 post_code,
                 post_name
             )
-            DO NOTHING
+            DO UPDATE SET
+                vacancy_count = excluded.vacancy_count,
+                status = excluded.status,
+                start_date = excluded.start_date,
+                end_date = excluded.end_date,
+                updatedAt = datetime('now')
         `,
         args: [
             vacancy.centerId,

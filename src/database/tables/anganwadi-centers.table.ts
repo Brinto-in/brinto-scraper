@@ -3,7 +3,7 @@ import { db } from '../../config/database.js';
 export async function createAnganwadiCentersTable(): Promise<void> {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS anganwadi_centers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
 
             state_name TEXT NOT NULL,
             district_name TEXT NOT NULL,
@@ -16,20 +16,17 @@ export async function createAnganwadiCentersTable(): Promise<void> {
             awc_name TEXT NOT NULL,
 
             createdAt TEXT DEFAULT (datetime('now')),
-            updatedAt TEXT DEFAULT (datetime('now'))
-        )
-    `);
+            updatedAt TEXT DEFAULT (datetime('now')),
 
-    await db.execute(`
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_awc
-        ON anganwadi_centers (
-            state_name,
-            district_name,
-            project_name,
-            sector_name,
-            gp,
-            area,
-            awc_name
+            UNIQUE (
+                state_name,
+                district_name,
+                project_name,
+                sector_name,
+                gp,
+                area,
+                awc_name
+            )
         )
     `);
 

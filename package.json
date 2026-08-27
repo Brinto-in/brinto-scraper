@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/Brinto-in/brinto-scraper#readme",
   "devDependencies": {
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.4.0",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   },
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
-    "axios": "^1.19.0",
+    "axios": "^1.20.0",
     "axios-cookiejar-support": "^7.0.0",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
