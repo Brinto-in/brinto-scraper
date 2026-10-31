@@ -87,6 +87,28 @@ interface SyncResult {
     failCount: number;
 }
 
+function formatSyncError(error: unknown): string {
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    if (typeof error === "object" && error !== null) {
+        const fields = ["message", "code", "details", "hint"]
+            .flatMap((key) => {
+                const value = (error as Record<string, unknown>)[key];
+                return typeof value === "string" && value
+                    ? [`${key}=${value}`]
+                    : [];
+            });
+
+        if (fields.length > 0) {
+            return fields.join(" ");
+        }
+    }
+
+    return String(error);
+}
+
 // ---------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------
@@ -908,13 +930,8 @@ async function syncRecordsToDatabase(
 
             failCount++;
 
-            const message =
-                err instanceof Error
-                    ? err.message
-                    : String(err);
-
             console.error(
-                `[db-sync error] ${message} ` +
+                `[db-sync error] ${formatSyncError(err)} ` +
                 `awwEventId=${row.awwEventId}`
             );
         }

@@ -1,18 +1,20 @@
-import { createClient } from '@libsql/client';
+import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const url = process.env.SUPABASE_URL;
+const secretKey = process.env.SUPABASE_SECRET_KEY;
 
 if (!url) {
-    throw new Error('TURSO_DATABASE_URL is not defined');
+    throw new Error('SUPABASE_URL is not defined');
 }
 
-if (!authToken) {
-    throw new Error('TURSO_AUTH_TOKEN is not defined');
+if (!secretKey) {
+    throw new Error('SUPABASE_SECRET_KEY is not defined');
 }
 
-export const db = createClient({
-    url,
-    authToken
+export const db = createClient(url, secretKey, {
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false
+    }
 });

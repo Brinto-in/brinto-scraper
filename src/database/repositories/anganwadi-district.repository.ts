@@ -18,44 +18,27 @@ export interface AnganwadiDistrict {
 export async function upsertDistrict(
   district: AnganwadiDistrict
 ): Promise<void> {
-  await db.execute({
-    sql: `
-        INSERT INTO anganwadi_districts (
-            state,
-            district_id,
-            district_name,
-            source_url,
-            login_url,
-            step_1_url,
-            captcha_url,
-            submit_url,
-            mobile,
-            password
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  const { error } = await db
+    .from('anganwadi_districts')
+    .upsert({
+      state: district.state,
+      district_id: district.districtId,
+      district_name: district.districtName,
+      source_url: district.sourceUrl,
+      login_url: district.loginUrl,
+      step_1_url: district.step1Url,
+      captcha_url: district.captchaUrl,
+      submit_url: district.submitUrl,
+      mobile: district.mobile ?? null,
+      password: district.password ?? null,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'state,district_id,source_url'
+    });
 
-        ON CONFLICT(state, district_id, source_url)
-        DO UPDATE SET
-            district_name = excluded.district_name,
-            login_url = excluded.login_url,
-            step_1_url = excluded.step_1_url,
-            captcha_url = excluded.captcha_url,
-            submit_url = excluded.submit_url,
-            updated_at = CURRENT_TIMESTAMP
-    `,
-    args: [
-      district.state,
-      district.districtId,
-      district.districtName,
-      district.sourceUrl,
-      district.loginUrl,
-      district.step1Url,
-      district.captchaUrl,
-      district.submitUrl,
-      district.mobile ?? null,
-      district.password ?? null
-    ]
-  });
+  if (error) {
+    throw error;
+  }
 }
 
 export interface PendingAnganwadiDistrict {
@@ -71,26 +54,19 @@ export interface PendingAnganwadiDistrict {
 export async function getPendingDistricts(
   state: string
 ): Promise<PendingAnganwadiDistrict[]> {
-  const result = await db.execute({
-    sql: `
-      SELECT
-        id,
-        state,
-        district_id,
-        district_name,
-        source_url,
-        captcha_url,
-        submit_url
-      FROM anganwadi_districts
-      WHERE mobile IS NULL
-        AND password IS NULL
-        AND state = ?
-      ORDER BY id
-    `,
-    args: [state]
-  });
+  const { data, error } = await db
+    .from('anganwadi_districts')
+    .select('id,state,district_id,district_name,source_url,captcha_url,submit_url')
+    .is('mobile', null)
+    .is('password', null)
+    .eq('state', state)
+    .order('id');
 
-  return result.rows.map((row) => ({
+  if (error) {
+    throw error;
+  }
+
+  return data.map((row) => ({
     id: Number(row.id),
     state: String(row.state),
     districtId: String(row.district_id),
@@ -106,21 +82,18 @@ export async function updateDistrictLogin(
   mobile: string,
   password: string
 ): Promise<void> {
-  await db.execute({
-    sql: `
-            UPDATE anganwadi_districts
-            SET
-                mobile = ?,
-                password = ?,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `,
-    args: [
+  const { error } = await db
+    .from('anganwadi_districts')
+    .update({
       mobile,
       password,
-      id
-    ]
-  });
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', id);
+
+  if (error) {
+    throw error;
+  }
 }
 
 export interface AnganwadiLoginDistrict {
@@ -144,33 +117,22 @@ export interface AnganwadiLoginDistrict {
 export async function getLoginDistricts(): Promise<
   AnganwadiLoginDistrict[]
 > {
-  const result = await db.execute(`
-        SELECT
-            id,
-            state,
-            district_id,
-            district_name,
-            login_url,
-            step_1_url,
-            captcha_url,
-            submit_url,
-            mobile,
-            password,
-            start_date,
-            end_date
-        FROM anganwadi_districts
-        WHERE mobile IS NOT NULL
-          AND password IS NOT NULL
-          AND mobile != ''
-          AND password != ''
-          AND (
-              end_date IS NULL
-              OR date(end_date) >= date('now')
-          )
-        ORDER BY id
-    `);
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await db
+    .from('anganwadi_districts')
+    .select('id,state,district_id,district_name,login_url,step_1_url,captcha_url,submit_url,mobile,password,start_date,end_date')
+    .not('mobile', 'is', null)
+    .not('password', 'is', null)
+    .neq('mobile', '')
+    .neq('password', '')
+    .or(`end_date.is.null,end_date.gte.${today}`)
+    .order('id');
 
-  return result.rows.map((row) => ({
+  if (error) {
+    throw error;
+  }
+
+  return data.map((row) => ({
     id: Number(row.id),
     state: String(row.state),
     districtId: String(row.district_id),
@@ -202,51 +164,58 @@ export interface TelanganaDistrict {
   endDate: string | null;
 }
 
+function toPostgresDate(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = value.trim();
+  const dayFirstMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(date);
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  const match = dayFirstMatch
+    ? [dayFirstMatch[0], dayFirstMatch[3], dayFirstMatch[2], dayFirstMatch[1]]
+    : isoMatch;
+
+  if (!match) {
+    throw new Error(`Unsupported Telangana district date: ${value}`);
+  }
+
+  const [, year, month, day] = match;
+  const parsedDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  if (
+    parsedDate.getUTCFullYear() !== Number(year) ||
+    parsedDate.getUTCMonth() !== Number(month) - 1 ||
+    parsedDate.getUTCDate() !== Number(day)
+  ) {
+    throw new Error(`Invalid Telangana district date: ${value}`);
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 export async function upsertTelanganaDistrict(
   district: TelanganaDistrict
 ): Promise<void> {
+  const { error } = await db
+    .from('anganwadi_districts')
+    .upsert({
+      state: district.stateName,
+      district_id: district.districtName,
+      district_name: district.districtName,
+      source_url: 'https://mis.tgwdcw.in/',
+      login_url: '',
+      captcha_url: '',
+      submit_url: '',
+      step_1_url: '',
+      start_date: toPostgresDate(district.startDate),
+      end_date: toPostgresDate(district.endDate),
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'state,district_id,source_url'
+    });
 
-  await db.execute({
-    sql: `
-            INSERT INTO anganwadi_districts (
-                state,
-                district_id,
-                district_name,
-                source_url,
-                login_url,
-                captcha_url,
-                submit_url,
-                step_1_url,
-                start_date,
-                end_date
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-
-            ON CONFLICT(state, district_id, source_url)
-            DO UPDATE SET
-                district_name = excluded.district_name,
-                start_date = excluded.start_date,
-                end_date = excluded.end_date,
-                updated_at = CURRENT_TIMESTAMP
-        `,
-    args: [
-      district.stateName,
-
-      // Telangana source currently doesn't provide a district ID.
-      // We can temporarily use district name as the unique identifier.
-      district.districtName,
-
-      district.districtName,
-
-      'https://mis.tgwdcw.in/',
-
-      '',
-      '',
-      '',
-      '',
-
-      district.startDate,
-      district.endDate
-    ]
-  });
+  if (error) {
+    throw error;
+  }
 }

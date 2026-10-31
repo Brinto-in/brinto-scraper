@@ -13,44 +13,29 @@ export interface AnganwadiCenter {
 export async function upsertAnganwadiCenter(
     center: AnganwadiCenter
 ): Promise<number> {
+    const { data, error } = await db
+        .from('anganwadi_centers')
+        .upsert({
+            state_name: center.stateName,
+            district_name: center.districtName,
+            project_name: center.projectName,
+            sector_name: center.sectorName,
+            gp: center.gp,
+            area: center.area,
+            awc_name: center.awcName,
+            updatedAt: new Date().toISOString()
+        }, {
+            onConflict: 'state_name,district_name,project_name,sector_name,gp,area,awc_name'
+        })
+        .select('id')
+        .single();
 
-    const result: any = await db.execute({
-        sql: `
-            INSERT INTO anganwadi_centers (
-                state_name,
-                district_name,
-                project_name,
-                sector_name,
-                gp,
-                area,
-                awc_name
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+    if (error) {
+        throw error;
+    }
+    if (!data) {
+        throw new Error('Supabase did not return the upserted anganwadi center');
+    }
 
-            ON CONFLICT (
-                state_name,
-                district_name,
-                project_name,
-                sector_name,
-                gp,
-                area,
-                awc_name
-            )
-            DO UPDATE SET
-                updatedAt = datetime('now')
-
-            RETURNING id
-        `,
-        args: [
-            center.stateName,
-            center.districtName,
-            center.projectName,
-            center.sectorName,
-            center.gp,
-            center.area,
-            center.awcName
-        ]
-    });
-
-    return Number(result.rows[0].id);
+    return Number(data.id);
 }
