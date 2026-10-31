@@ -8,6 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "build-and-start": "npm run build && npm start",
+    "pm2:start": "npm run build && pm2 startOrRestart ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop brinto-scraper",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
