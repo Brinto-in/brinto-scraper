@@ -38,5 +38,5 @@ export async function runTelanganaAnganwadi(): Promise<void> {
         `✓ Telangana districts processed: ${districts.length}`
     );
 
-    // await scrapeTelanganaAnganwadi();
+    await scrapeTelanganaAnganwadi();
 }
